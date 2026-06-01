@@ -1,5 +1,42 @@
 # IoT2050 IO Shield — Pràctica per a alumnes
 
+## 📖 Manual oficial Siemens
+
+Descarrega el manual complet aquí:
+- **Siemens Support:** https://support.industry.siemens.com/cs/document/109745681/iot2000-extension-modules-operating-instructions
+- **Document:** `A5E39456816-AB_Operating_Instructions_IOT2000_Extension_Modules_1910.pdf`
+
+---
+
+## 📦 Models del shield
+
+| Model | Descripció |
+|-------|-----------|
+| **6ES7647-0KA01-0AA2** ⬅️ El nostre | **Input/Output Module** — 5x DI, 2x AI, **2x DQ** (amb sortides) |
+| 6ES7647-0KA02-0AA2 | Input Module Sink/Source — 8x DI (només entrades) |
+
+> El **0KA01** és el model complet amb **sortides digitals (DQ)**. El **0KA02** només té entrades.
+
+---
+
+## 🔍 Estructura física del mòdul (Secció 1.2.1 del manual)
+
+![Estructura del mòdul I/O - Pàg 8](images/structure-page8.png)
+*Vista general del mòdul: connectors, LEDs i bornes*
+
+![Estructura del mòdul I/O - Pàg 9](images/structure-page9.png)
+*Detall del mòdul Input Sink/Source (0KA02)*
+
+### Llegenda del mòdul (6ES7647-0KA01-0AA2):
+
+1. **Connector X1** — Bornes de cargol (13 pins) per a DI, DQ, AI i alimentació
+2. **LEDs d'estat** — Indicadors de funcionament i comunicació
+3. **Connector Arduino** — Pinheader per connectar al IoT2050
+4. **Jumpers de configuració** — Per AI (0-10V / 0-20mA)
+
+---
+
+
 ## 🎯 Objectiu
 
 Controlar les sortides digitals **DQ0** i **DQ1** del shield IO Siemens 6ES7647-0KA01-0AA2 connectat al **SIMATIC IoT2050** mitjançant:
