@@ -24,10 +24,9 @@ Descarrega el manual complet aquí:
 ![Estructura del mòdul I/O - Pàg 8](images/structure-page8.png)
 *Vista general del mòdul: connectors, LEDs i bornes*
 
-![Estructura del mòdul I/O - Pàg 9](images/structure-page9.png)
-*Detall del mòdul Input Sink/Source (0KA02)*
 
-### Llegenda del mòdul (6ES7647-0KA01-0AA2):
+
+### Llegenda del mòdul 6ES7647-0KA01-0AA2:
 
 1. **Connector X1** — Bornes de cargol (13 pins) per a DI, DQ, AI i alimentació
 2. **LEDs d'estat** — Indicadors de funcionament i comunicació
