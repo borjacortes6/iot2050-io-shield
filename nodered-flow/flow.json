@@ -1,0 +1,425 @@
+[
+  {
+    "id": "tab_dashboard",
+    "type": "ui_tab",
+    "name": "Control IoT2050",
+    "icon": "dashboard",
+    "disabled": false,
+    "hidden": false
+  },
+  {
+    "id": "group_dq",
+    "type": "ui_group",
+    "name": "Sortides Digitals (DQ)",
+    "tab": "tab_dashboard",
+    "order": 1,
+    "disp": true,
+    "width": 6
+  },
+  {
+    "id": "group_di",
+    "type": "ui_group",
+    "name": "Entrades Digitals (DI)",
+    "tab": "tab_dashboard",
+    "order": 2,
+    "disp": true,
+    "width": 6
+  },
+  {
+    "id": "btn_dq0_on",
+    "type": "ui_button",
+    "group": "group_dq",
+    "order": 1,
+    "width": 2,
+    "height": 1,
+    "passthru": false,
+    "label": "DQ0 ⬤ ON",
+    "color": "#4CAF50",
+    "bgcolor": "",
+    "icon": "power",
+    "payload": "1",
+    "payloadType": "str",
+    "topic": "dq0",
+    "x": 100,
+    "y": 100,
+    "wires": [
+      [
+        "exec_dq0"
+      ]
+    ]
+  },
+  {
+    "id": "btn_dq0_off",
+    "type": "ui_button",
+    "group": "group_dq",
+    "order": 2,
+    "width": 2,
+    "height": 1,
+    "passthru": false,
+    "label": "DQ0 ◯ OFF",
+    "color": "#f44336",
+    "bgcolor": "",
+    "icon": "power_settings_new",
+    "payload": "0",
+    "payloadType": "str",
+    "topic": "dq0",
+    "x": 100,
+    "y": 160,
+    "wires": [
+      [
+        "exec_dq0"
+      ]
+    ]
+  },
+  {
+    "id": "status_dq0",
+    "type": "ui_text",
+    "group": "group_dq",
+    "order": 3,
+    "width": 2,
+    "height": 1,
+    "label": "DQ0:",
+    "format": "<span style='color:{{msg.payload===\"1\"?\"#4CAF50\":\"#f44336\"}}'>{{msg.payload===\"1\"?\"⬤ ON\":\"◯ OFF\"}}</span>",
+    "layout": "row-left",
+    "x": 100,
+    "y": 220
+  },
+  {
+    "id": "btn_dq1_on",
+    "type": "ui_button",
+    "group": "group_dq",
+    "order": 4,
+    "width": 2,
+    "height": 1,
+    "passthru": false,
+    "label": "DQ1 ⬤ ON",
+    "color": "#4CAF50",
+    "bgcolor": "",
+    "icon": "power",
+    "payload": "1",
+    "payloadType": "str",
+    "topic": "dq1",
+    "x": 100,
+    "y": 280,
+    "wires": [
+      [
+        "exec_dq1"
+      ]
+    ]
+  },
+  {
+    "id": "btn_dq1_off",
+    "type": "ui_button",
+    "group": "group_dq",
+    "order": 5,
+    "width": 2,
+    "height": 1,
+    "passthru": false,
+    "label": "DQ1 ◯ OFF",
+    "color": "#f44336",
+    "bgcolor": "",
+    "icon": "power_settings_new",
+    "payload": "0",
+    "payloadType": "str",
+    "topic": "dq1",
+    "x": 100,
+    "y": 340,
+    "wires": [
+      [
+        "exec_dq1"
+      ]
+    ]
+  },
+  {
+    "id": "status_dq1",
+    "type": "ui_text",
+    "group": "group_dq",
+    "order": 6,
+    "width": 2,
+    "height": 1,
+    "label": "DQ1:",
+    "format": "<span style='color:{{msg.payload===\"1\"?\"#4CAF50\":\"#f44336\"}}'>{{msg.payload===\"1\"?\"⬤ ON\":\"◯ OFF\"}}</span>",
+    "layout": "row-left",
+    "x": 100,
+    "y": 400
+  },
+  {
+    "id": "exec_dq0",
+    "type": "exec",
+    "command": "echo",
+    "addpay": true,
+    "append": " > /sys/class/gpio/gpio355/value",
+    "useSpawn": false,
+    "timer": "",
+    "oldrc": false,
+    "x": 350,
+    "y": 130,
+    "wires": [
+      [
+        "status_dq0"
+      ],
+      [],
+      []
+    ]
+  },
+  {
+    "id": "exec_dq1",
+    "type": "exec",
+    "command": "echo",
+    "addpay": true,
+    "append": " > /sys/class/gpio/gpio360/value",
+    "useSpawn": false,
+    "timer": "",
+    "oldrc": false,
+    "x": 350,
+    "y": 310,
+    "wires": [
+      [
+        "status_dq1"
+      ],
+      [],
+      []
+    ]
+  },
+  {
+    "id": "timer_dq",
+    "type": "inject",
+    "name": "Refrescar DQ (2s)",
+    "repeat": "2",
+    "crontab": "",
+    "once": true,
+    "onceDelay": 0.5,
+    "topic": "read_dq",
+    "payload": "",
+    "payloadType": "str",
+    "x": 50,
+    "y": 50,
+    "wires": [
+      [
+        "exec_read_dq0",
+        "exec_read_dq1"
+      ]
+    ]
+  },
+  {
+    "id": "exec_read_dq0",
+    "type": "exec",
+    "command": "cat /sys/class/gpio/gpio355/value",
+    "addpay": false,
+    "append": "",
+    "useSpawn": false,
+    "timer": "",
+    "oldrc": false,
+    "x": 250,
+    "y": 100,
+    "wires": [
+      [
+        "status_dq0"
+      ],
+      [],
+      []
+    ]
+  },
+  {
+    "id": "exec_read_dq1",
+    "type": "exec",
+    "command": "cat /sys/class/gpio/gpio360/value",
+    "addpay": false,
+    "append": "",
+    "useSpawn": false,
+    "timer": "",
+    "oldrc": false,
+    "x": 250,
+    "y": 220,
+    "wires": [
+      [
+        "status_dq1"
+      ],
+      [],
+      []
+    ]
+  },
+  {
+    "id": "timer_di",
+    "type": "inject",
+    "name": "Refrescar DI (2s)",
+    "repeat": "2",
+    "crontab": "",
+    "once": true,
+    "onceDelay": 0.5,
+    "topic": "read_di",
+    "payload": "",
+    "payloadType": "str",
+    "x": 50,
+    "y": 500,
+    "wires": [
+      [
+        "exec_di0",
+        "exec_di1",
+        "exec_di2",
+        "exec_di3",
+        "exec_di4"
+      ]
+    ]
+  },
+  {
+    "id": "exec_di0",
+    "type": "exec",
+    "command": "cat /sys/class/gpio/gpio437/value",
+    "addpay": false,
+    "append": "",
+    "useSpawn": false,
+    "timer": "",
+    "oldrc": false,
+    "x": 250,
+    "y": 400,
+    "wires": [
+      [
+        "status_di0"
+      ],
+      [],
+      []
+    ]
+  },
+  {
+    "id": "status_di0",
+    "type": "ui_text",
+    "group": "group_di",
+    "order": 1,
+    "width": 3,
+    "height": 1,
+    "label": "DI0 (Borne 1):",
+    "format": "{{msg.payload}}",
+    "layout": "row-left",
+    "x": 500,
+    "y": 400
+  },
+  {
+    "id": "exec_di1",
+    "type": "exec",
+    "command": "cat /sys/class/gpio/gpio438/value",
+    "addpay": false,
+    "append": "",
+    "useSpawn": false,
+    "timer": "",
+    "oldrc": false,
+    "x": 250,
+    "y": 450,
+    "wires": [
+      [
+        "status_di1"
+      ],
+      [],
+      []
+    ]
+  },
+  {
+    "id": "status_di1",
+    "type": "ui_text",
+    "group": "group_di",
+    "order": 2,
+    "width": 3,
+    "height": 1,
+    "label": "DI1 (Borne 2):",
+    "format": "{{msg.payload}}",
+    "layout": "row-left",
+    "x": 500,
+    "y": 450
+  },
+  {
+    "id": "exec_di2",
+    "type": "exec",
+    "command": "cat /sys/class/gpio/gpio439/value",
+    "addpay": false,
+    "append": "",
+    "useSpawn": false,
+    "timer": "",
+    "oldrc": false,
+    "x": 250,
+    "y": 500,
+    "wires": [
+      [
+        "status_di2"
+      ],
+      [],
+      []
+    ]
+  },
+  {
+    "id": "status_di2",
+    "type": "ui_text",
+    "group": "group_di",
+    "order": 3,
+    "width": 3,
+    "height": 1,
+    "label": "DI2 (Borne 3):",
+    "format": "{{msg.payload}}",
+    "layout": "row-left",
+    "x": 500,
+    "y": 500
+  },
+  {
+    "id": "exec_di3",
+    "type": "exec",
+    "command": "cat /sys/class/gpio/gpio441/value",
+    "addpay": false,
+    "append": "",
+    "useSpawn": false,
+    "timer": "",
+    "oldrc": false,
+    "x": 250,
+    "y": 550,
+    "wires": [
+      [
+        "status_di3"
+      ],
+      [],
+      []
+    ]
+  },
+  {
+    "id": "status_di3",
+    "type": "ui_text",
+    "group": "group_di",
+    "order": 4,
+    "width": 3,
+    "height": 1,
+    "label": "DI3 (Borne 4):",
+    "format": "{{msg.payload}}",
+    "layout": "row-left",
+    "x": 500,
+    "y": 550
+  },
+  {
+    "id": "exec_di4",
+    "type": "exec",
+    "command": "cat /sys/class/gpio/gpio345/value",
+    "addpay": false,
+    "append": "",
+    "useSpawn": false,
+    "timer": "",
+    "oldrc": false,
+    "x": 250,
+    "y": 600,
+    "wires": [
+      [
+        "status_di4"
+      ],
+      [],
+      []
+    ]
+  },
+  {
+    "id": "status_di4",
+    "type": "ui_text",
+    "group": "group_di",
+    "order": 5,
+    "width": 3,
+    "height": 1,
+    "label": "DI4 (Borne 5):",
+    "format": "{{msg.payload}}",
+    "layout": "row-left",
+    "x": 500,
+    "y": 600
+  }
+]
