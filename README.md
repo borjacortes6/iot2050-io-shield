@@ -19,196 +19,159 @@ Descarrega el manual complet aquí:
 
 ---
 
-## 🔍 Estructura física del mòdul (Secció 1.2.1 del manual)
+## 🔍 Estructura física del mòdul
+
+**Secció 1.2.1 del manual (Pàg. 7):**
 
 ![Estructura del mòdul I/O - Pàg 7](images/structure-page7.png)
-*Vista general del mòdul: connectors, LEDs i bornes*
 
-
+*Pàg 7 del manual: estructura del mòdul amb descripció de cada connector*
 
 ### Llegenda del mòdul 6ES7647-0KA01-0AA2:
 
-1. **Connector X1** — Bornes de cargol (13 pins) per a DI, DQ, AI i alimentació
-2. **LEDs d'estat** — Indicadors de funcionament i comunicació
-3. **Connector Arduino** — Pinheader per connectar al IoT2050
-4. **Jumpers de configuració** — Per AI (0-10V / 0-20mA)
+| Núm. | Connector | Descripció |
+|------|-----------|------------|
+| ① | **Analog interface M** | Massa de les entrades analògiques |
+| | **U0, U1** | Entrades de tensió analògica (0-10V) → **Bornes 6, 7** |
+| | **I0, I1** | Entrades de corrent analògica (0-20mA) |
+| ② | **Digital output interface M** | Massa de les sortides digitals |
+| | **DO0, DO1** | Sortides digitals (24V, 0.3A) → **Bornes 8 (DQ0), 9 (DQ1)** |
+| ③ | **Digital input interface** | Entrades digitals → **Bornes 1-5 (DI0-DI4)** |
+| | **M** | Massa de les entrades digitals |
+| ④ | **X1** | Connector de bornes principal (13 pins) |
+| ⑤ | **X2** | Alimentació externa per a les sortides DQ |
+| ⑥ | **X3** | Connector Arduino (acoblament al IoT2050) |
 
 ---
 
+## 🗺️ Pinout — Connexions als bornes (X1)
 
-## 🎯 Objectiu
+**Secció 4.2.3 del manual — Hardware Interface (Pàg. 30):**
 
-Controlar les sortides digitals **DQ0** i **DQ1** del shield IO Siemens 6ES7647-0KA01-0AA2 connectat al **SIMATIC IoT2050** mitjançant:
+![Hardware Interface Pinout](images/hardware-interface-pinout.png)
 
-1. **PuTTY** (SSH) — Configurar els GPIOs manualment
-2. **Node-RED** — Crear un dashboard web amb botons ON/OFF
+*Pàg 30: taula d'assignació de pins del connector X1*
+
+### Taula resum:
+
+| Borne | Senyal | GPIO | Sysfs |
+|-------|--------|------|-------|
+| 1 | DI0 | gpio437 | `/sys/class/gpio/gpio437/value` |
+| 2 | DI1 | gpio438 | `/sys/class/gpio/gpio438/value` |
+| 3 | DI2 | gpio439 | `/sys/class/gpio/gpio439/value` |
+| 4 | DI3 | gpio441 | `/sys/class/gpio/gpio441/value` |
+| 5 | DI4 | gpio345 | `/sys/class/gpio/gpio345/value` |
+| 6 | AI0 | — | A0 (ADC) |
+| 7 | AI1 | — | A1 (ADC) |
+| **8** | **DQ0** | **gpio355** | **`/sys/class/gpio/gpio355/value`** |
+| **9** | **DQ1** | **gpio360** | **`/sys/class/gpio/gpio360/value`** |
+| 10 | +24V DQ | — | Alimentació externa DQ (+) |
+| 11 | 0V DQ | — | Massa DQ |
+| 12 | +24V | — | Alimentació del mòdul |
+| 13 | 0V/GND | — | Massa general |
 
 ---
 
-## 📦 Material necessari
+## 🔧 Com es va descobrir el número de GPIO?
 
-- IoT2050 amb shield IO connectat
-- Font d'alimentació 24V DC
-- Cables de connexió
-- (Opcional) LEDs amb resistència o relé per veure les sortides
-- Ordinador amb **PuTTY** instal·lat i connexió a la xarxa del IoT2050
+Al contrari d'altres sistemes on els GPIOs tenen números fixos (com el GPIO2 d'un ESP32), al IoT2050 els números depenen de com el kernel assigna els controladors en arrencar.
 
----
-
-## 🔌 1. Accés al IoT2050 via PuTTY
-
-### 1.1 Connecta't per SSH
-
-1. Obre **PuTTY**
-2. Configura:
-   - **Host Name (or IP address):** `192.168.200.1`
-   - **Port:** `22`
-   - **Connection type:** `SSH`
-3. Fes clic a **Open**
-4. Quan demani usuari, escriu: `root`
-5. Quan demani contrasenya, escriu: `123456`
-
-> ✅ Ja ets dins del IoT2050!
-
-### 1.2 Comandes bàsiques per conèixer el sistema
+### Pas 1: Identificar els gpiochips
 
 ```bash
-# Veure informació del sistema
-uname -a
-cat /proc/device-tree/model
-
-# Veure tots els GPIOs disponibles
 gpiodetect
-
-# Veure l'estat de tots els GPIOs
-gpioinfo
-
-# Veure informació detallada
-cat /sys/kernel/debug/gpio
 ```
+
+Al IoT2050 hi ha **6 gpiochips**. Ens interessen els que tenen senyals **IO0-IO13** i **A0-A5**:
+
+| Chip | GPIOs | Dispositiu | Funció |
+|------|-------|-----------|--------|
+| gpiochip0 | 496-511 | PCAL9535 (I2C 1-0020) | Pull-ups + enables |
+| gpiochip1 | 480-495 | PCAL9535 (I2C 1-0021) | Direcció IO0-IO13 |
+| gpiochip2 | 464-479 | PCAL9535 (I2C 1-0025) | Pull-ups selectius |
+| **gpiochip3** | **408-463** | **42110000.gpio** | **GPIOs del processador (IO0-IO13, A0-A5)** |
+| **gpiochip4** | **312-407** | **600000.gpio** | **GPIOs del processador (IO4-IO9)** |
+| gpiochip5 | 222-311 | 601000.gpio | Altres perifèrics |
+
+### Pas 2: Llistar les línies
+
+```bash
+gpioinfo gpiochip3
+gpioinfo gpiochip4
+```
+
+A **gpiochip3** (base 408, 56 línies):
+```
+line 29: "IO0" → gpio408+29 = gpio437  → DI0 (Borne 1)
+line 30: "IO1" → gpio408+30 = gpio438  → DI1 (Borne 2)
+line 31: "IO2" → gpio408+31 = gpio439  → DI2 (Borne 3)
+line 33: "IO3" → gpio408+33 = gpio441  → DI3 (Borne 4)
+```
+
+A **gpiochip4** (base 312, 96 línies):
+```
+line 33: "IO4" → gpio312+33 = gpio345  → DI4 (Borne 5)
+line 43: "IO7" → gpio312+43 = gpio355  → DQ0 (Borne 8) ✅
+line 48: "IO8" → gpio312+48 = gpio360  → DQ1 (Borne 9) ✅
+```
+
+### Pas 3: Comprovar-ho experimentalment
+
+```bash
+echo 1 > /sys/class/gpio/gpio355/value   # Activar → tester marca 24V
+cat /sys/class/gpio/gpio355/value        # Retorna 1 ✅
+echo 0 > /sys/class/gpio/gpio355/value   # Desactivar → tester marca 0V
+```
+
+> 🧪 **Fórmula:** `Número GPIO = base_del_chip + número_de_línia`
 
 ---
 
-## ⚙️ 2. Configurar els GPIOs de les sortides DQ
+## 🔌 Cablejat de les sortides DQ
 
-Les sortides DQ0 i DQ1 es controlen a través del sistema de fitxers **sysfs** de Linux.
+**⚠️ IMPORTANT:** Les sortides DQ necessiten **alimentació externa de 24V DC** (bornes 10 i 11).
 
-### 2.1 Exportar els GPIOs (si no ho estan ja)
+### Alimentació per a les sortides DQ (Pàg. 20 del manual)
 
-```bash
-# Exportar DQ0 (GPIO 355)
-echo 355 > /sys/class/gpio/export
-
-# Exportar DQ1 (GPIO 360)
-echo 360 > /sys/class/gpio/export
-```
-
-> Si veieu l'error "Device or resource busy", vol dir que ja estan exportats. No passa res.
-
-### 2.2 Configurar la direcció com a OUTPUT
-
-```bash
-# DQ0 com a sortida
-echo out > /sys/class/gpio/gpio355/direction
-
-# DQ1 com a sortida
-echo out > /sys/class/gpio/gpio360/direction
-```
-
-### 2.3 Activar / Desactivar les sortides
-
-```bash
-# Activar DQ0 (posar a 1)
-echo 1 > /sys/class/gpio/gpio355/value
-
-# Desactivar DQ0 (posar a 0)
-echo 0 > /sys/class/gpio/gpio355/value
-
-# Activar DQ1
-echo 1 > /sys/class/gpio/gpio360/value
-
-# Desactivar DQ1
-echo 0 > /sys/class/gpio/gpio360/value
-```
-
-### 2.4 Comprovar l'estat
-
-```bash
-# Llegir l'estat actual
-cat /sys/class/gpio/gpio355/value
-cat /sys/class/gpio/gpio360/value
-```
-
-> 📝 Retorna **0** = OFF, **1** = ON
-
-### 2.5 Script complet per a l'arrencada
-
-Per no haver de fer-ho cada vegada que es reinicia el IoT2050:
-
-```bash
-nano /etc/rc.local
-```
-
-Afegiu aquest contingut abans del `exit 0`:
-
-```bash
-# Exportar GPIOs del shield IO
-echo 355 > /sys/class/gpio/export 2>/dev/null
-echo 360 > /sys/class/gpio/export 2>/dev/null
-
-# Configurar com a sortides
-echo out > /sys/class/gpio/gpio355/direction
-echo out > /sys/class/gpio/gpio360/direction
-
-# Posar a OFF per defecte
-echo 0 > /sys/class/gpio/gpio355/value
-echo 0 > /sys/class/gpio/gpio360/value
-```
-
-Després:
-```bash
-chmod +x /etc/rc.local
-```
-
----
-
-## 🔌 3. Cablejat de les sortides DQ
-
-**⚠️ IMPORTANT:** Les sortides DQ necessiten **alimentació externa de 24V DC** per funcionar.
-
-### Esquema de connexió (del manual oficial Siemens)
-
-#### Connexió de l'alimentació per a les sortides DQ
 ![Alimentació DQ](images/wiring-power-dq.png)
 
-#### Connexió de les entrades digitals (DI)
+*Pàg 20: connexió de la font d'alimentació externa per a DQ0 i DQ1*
+
+> Cal connectar una font de 9-36V DC als bornes **10 (+24V DQ)** i **11 (0V DQ)**
+
+### Connexió de les entrades digitals (Pàg. 21 del manual)
+
 ![Entrades digitals](images/wiring-digital-inputs.png)
 
-#### Connexió de les sortides digitals (DQ) i entrades analògiques (AI)
+*Pàg 21: connexió dels sensors/ interruptors a les entrades DI0-DI4*
+
+### Connexió de les sortides digitals i entrades analògiques (Pàg. 22)
+
 ![Sortides digitals i entrades analògiques](images/wiring-digital-outputs-analog.png)
 
-### Hardware Interface — Taula d'assignació de pins
-![Hardware Interface Pinout](images/hardware-interface-pinout.png)
+*Pàg 22: connexió de càrregues a DQ0/DQ1 i sensors analògics a AI0/AI1*
 
 ### Esquema resum
 
 ```
-Bornes del shield IO (X1):
-
-  [8] DQ0  ──────┐
-                 ├──── Càrrega (LED+resistència, relé, etc.)
-  [10] +24V DQ ──┘         │
-                           └────── +24V (font externa)
-  [11] 0V DQ ────────────── GND (font externa)
-
-  [9] DQ1  ──────┐
-                 ├──── Altra càrrega
-  [10] +24V DQ ──┘
+               ┌─────────────────────────┐
+               │      IoT2050 + Shield    │
+               │                         │
+  [Borne 12]───┤ +24V                    │
+  [Borne 13]───┤ GND                     │
+               │                         │
+  [Borne 10]───┤ +24V DQ  ──────┬─── 24V │  Font externa
+  [Borne 11]───┤ 0V DQ   ──────┴─── GND  │  (9-36V DC)
+               │                         │
+  [Borne  8]───┤ DQ0 ────── Càrrega ──┐  │
+               │                      │   │
+  [Borne 10]───┤ +24V DQ ────────────┘   │
+               │                         │
+  [Borne 1]────┤ DI0 ──── Sensor/Polsador│
+               └─────────────────────────┘
 ```
 
 ### Exemple amb LED
-
-Per provar amb un LED indicador:
 
 ```
 Borne 8 (DQ0) ──── LED ──── Resistència 1kΩ ──── Borne 10 (+24V DQ)
@@ -217,15 +180,60 @@ Borne 11 (0V DQ) ─────────────────────
 
 Quan activeu DQ0 (`echo 1 > ...`), el LED s'encendrà.
 
-## 🎛️ 4. Node-RED: Dashboard amb botons ON/OFF
+---
 
-Node-RED ja està instal·lat al IoT2050. L'editor web està a:
+## 🔌 1. Accés al IoT2050 via PuTTY
 
-> **http://192.168.200.1:1880/**
+1. Obre **PuTTY**
+2. **Host Name:** `192.168.200.1`
+3. **Port:** `22` · **Connection type:** `SSH`
+4. **Open** → usuari: `root` · contrasenya: `123456`
 
-### 4.1 Instal·lar el node-red-dashboard (si no està)
+Comandes per conèixer el sistema:
+```bash
+uname -a                    # Informació del sistema
+gpiodetect                  # Veure gpiochips
+gpioinfo gpiochip4          # Veure GPIOs del chip 4
+cat /sys/kernel/debug/gpio  # Estat complet
+```
 
-Connecteu-vos per SSH i executeu:
+---
+
+## ⚙️ 2. Configurar els GPIOs de les sortides DQ
+
+```bash
+# Exportar (si cal)
+echo 355 > /sys/class/gpio/export
+echo 360 > /sys/class/gpio/export
+
+# Configurar com a sortida
+echo out > /sys/class/gpio/gpio355/direction
+echo out > /sys/class/gpio/gpio360/direction
+
+# Activar / Desactivar
+echo 1 > /sys/class/gpio/gpio355/value   # DQ0 ON
+echo 0 > /sys/class/gpio/gpio355/value   # DQ0 OFF
+echo 1 > /sys/class/gpio/gpio360/value   # DQ1 ON
+echo 0 > /sys/class/gpio/gpio360/value   # DQ1 OFF
+
+# Llegir estat
+cat /sys/class/gpio/gpio355/value
+```
+
+### Prova amb el multímetre
+
+Connecteu el tester en mode **V⎓ DC** entre:
+- **Borne 8 (DQ0)** i **Borne 10 (+24V DQ)**
+  - DQ0 = ON → marca **~24V** ✅
+  - DQ0 = OFF → marca **~0V** ❌
+
+> El transistor intern connecta DQ0 a GND (0V) quan està actiu, completant el circuit amb els 24V de l'alimentació externa.
+
+---
+
+## 🎛️ 3. Node-RED: Dashboard amb botons ON/OFF
+
+### 3.1 Instal·lar node-red-dashboard (si no està)
 
 ```bash
 cd /usr/lib/node_modules/node-red
@@ -233,51 +241,14 @@ npm install node-red-dashboard
 systemctl restart node-red
 ```
 
-### 4.2 Importar el flow
+### 3.2 Importar el flow
 
-1. Obre **http://192.168.200.1:1880/** al navegador
-2. Ves al menú ☰ (tres ratlles) a dalt a la dreta
-3. Selecciona **Import** → **Clipboard**
-4. Obre el fitxer `flow.json` d'aquest repositori o enganxa el codi següent:
-5. Fes clic a **Import**
-6. Fes clic al botó **Deploy** (taronja, a dalt a la dreta)
+1. Obre **http://192.168.200.1:1880/** (editor)
+2. ☰ Menu → **Import** → **Clipboard**
+3. Enganxa el contingut de `nodered-flow/flow.json`
+4. **Deploy** (botó taronja)
 
-### 4.3 Flow: 4 botons per controlar DQ0 i DQ1
-
-```
-                    ┌──────────────┐
-                    │  Llegir (3s) │ (refresca l'estat cada 3 segons)
-                    └──────┬───────┘
-                           │
-            ┌──────────────┼──────────────┐
-            │              │              │
-     ┌──────▼──────┐  ┌───▼────────┐
-     │ Llegir DQ0  │  │ Llegir DQ1 │
-     └──────┬──────┘  └────┬───────┘
-            │              │
-     ┌──────▼──────┐  ┌───▼────────┐
-     │ Estat DQ0   │  │ Estat DQ1  │  (indicadors text)
-     └─────────────┘  └────────────┘
-
-┌──────────┐   ┌──────────┐   ┌──────────┐   ┌──────────┐
-│ DQ0 ⬤ ON│   │ DQ0 ◯ OFF│   │ DQ1 ⬤ ON│   │ DQ1 ◯ OFF│
-└────┬─────┘   └────┬─────┘   └────┬─────┘   └────┬─────┘
-     │              │              │              │
-     └──────┬───────┘              └──────┬───────┘
-            │                            │
-     ┌──────▼──────┐              ┌──────▼──────┐
-     │ Exec DQ0    │              │ Exec DQ1    │
-     │ (gpio355)   │              │ (gpio360)   │
-     └─────────────┘              └─────────────┘
-```
-
-### 4.4 Accedir al Dashboard
-
-Obre al navegador:
-
-> **http://192.168.200.1:1880/ui/**
-
-Hauries de veure una pantalla amb 4 botons:
+### 3.3 El flow: 4 botons + 2 indicadors
 
 ```
 ┌──────────────────────────────────────────┐
@@ -287,59 +258,64 @@ Hauries de veure una pantalla amb 4 botons:
 │                                          │
 │  ┌──────────────┐  ┌──────────────┐      │
 │  │  DQ0 ⬤ ON   │  │  DQ0 ◯ OFF  │      │
-│  └──────────────┘  └──────────────┘      │
-│  Estat DQ0: 1                            │
+│  └──────┬───────┘  └──────┬───────┘      │
+│         │                 │              │
+│         └────────┬────────┘              │
+│                  │                       │
+│          ┌───────▼───────┐               │
+│          │ exec "echo X   │               │
+│          │ > gpio355/value│               │
+│          └───────┬───────┘               │
+│                  │                       │
+│          ┌───────▼───────┐               │
+│          │ Estat DQ0: 1  │               │
+│          └───────────────┘               │
 │                                          │
 │  ┌──────────────┐  ┌──────────────┐      │
 │  │  DQ1 ⬤ ON   │  │  DQ1 ◯ OFF  │      │
-│  └──────────────┘  └──────────────┘      │
-│  Estat DQ1: 0                            │
+│  └──────┬───────┘  └──────┬───────┘      │
+│         │                 │              │
+│         └────────┬────────┘              │
+│                  │                       │
+│          ┌───────▼───────┐               │
+│          │ exec "echo X   │               │
+│          │ > gpio360/value│               │
+│          └───────┬───────┘               │
+│                  │                       │
+│          ┌───────▼───────┐               │
+│          │ Estat DQ1: 0  │               │
+│          └───────────────┘               │
 └──────────────────────────────────────────┘
 ```
 
-### 4.5 Com funciona cada botó
+Cada botó executa: `echo {valor} > /sys/class/gpio/gpio{355/360}/value`
 
-| Botó | Acció | Comando que s'executa |
-|------|-------|----------------------|
-| DQ0 ⬤ ON | Activa DQ0 | `echo 1 > /sys/class/gpio/gpio355/value` |
-| DQ0 ◯ OFF | Desactiva DQ0 | `echo 0 > /sys/class/gpio/gpio355/value` |
-| DQ1 ⬤ ON | Activa DQ1 | `echo 1 > /sys/class/gpio/gpio360/value` |
-| DQ1 ◯ OFF | Desactiva DQ1 | `echo 0 > /sys/class/gpio/gpio360/value` |
+### 3.4 Dashboard
+
+Obre **http://192.168.200.1:1880/ui/** i prova els botons!
 
 ---
 
-## 📊 Resum del mapping
-
-| Borne | Senyal | GPIO | Fitxer sysfs |
-|-------|--------|------|-------------|
-| 8 | **DQ0** | **gpio355** | `/sys/class/gpio/gpio355/value` |
-| 9 | **DQ1** | **gpio360** | `/sys/class/gpio/gpio360/value` |
-| 10 | +24V DQ | — | Alimentació externa |
-| 11 | 0V DQ | — | Massa externa |
-
----
-
-## 🧪 Prova ràpida
-
-Des de PuTTY:
+## 🧪 Prova ràpida des de PuTTY
 
 ```bash
-# Configurar
+# Exportar i configurar
 echo 355 > /sys/class/gpio/export
 echo 360 > /sys/class/gpio/export
 echo out > /sys/class/gpio/gpio355/direction
 echo out > /sys/class/gpio/gpio360/direction
 
 # Provar DQ0
-echo 1 > /sys/class/gpio/gpio355/value   # 🔵 Encendre
-echo 0 > /sys/class/gpio/gpio355/value   # ⚫ Apagar
+echo 1 > /sys/class/gpio/gpio355/value   # 🔵 ON
+echo 0 > /sys/class/gpio/gpio355/value   # ⚫ OFF
 
 # Provar DQ1
-echo 1 > /sys/class/gpio/gpio360/value   # 🔵 Encendre
-echo 0 > /sys/class/gpio/gpio360/value   # ⚫ Apagar
+echo 1 > /sys/class/gpio/gpio360/value   # 🔵 ON
+echo 0 > /sys/class/gpio/gpio360/value   # ⚫ OFF
 ```
 
-> ⚠️ **Recordeu:** Si les sortides no commuten, comproveu que teniu **24V DC connectat als bornes 10 i 11**.
+> ⚠️ **Recordeu:** Si no commuta, comproveu que teniu **24V DC als bornes 10 i 11**.
+> Si encara no funciona, proveu `cat /sys/class/gpio/gpio355/direction` per confirmar que sigui **"out"**.
 
 ---
 
@@ -347,24 +323,22 @@ echo 0 > /sys/class/gpio/gpio360/value   # ⚫ Apagar
 
 ```
 iot2050-io-shield/
-├── README.md              ← Aquest fitxer (guia per alumnes)
+├── README.md                    ← Aquesta guia
 ├── docs/
-│   ├── pinout.md          ← Pinout detallat
-│   └── node-red-dashboard.md ← Configuració avançada
+│   └── node-red-dashboard.md    ← Configuració avançada
 ├── nodered-flow/
-│   └── flow.json          ← Flow de Node-RED (4 botons)
+│   └── flow.json                ← Flow de Node-RED (4 botons)
 ├── scripts/
-│   ├── export-gpios.sh    ← Script per exportar GPIOs
-│   └── setup-gpios.sh     ← Script per a rc.local
-└── images/                ← Diagrames del manual
+│   ├── export-gpios.sh          ← Exporta i configura GPIOs
+│   └── setup-gpios.sh           ← Per a rc.local (arrencada)
+└── images/
+    ├── structure-page7.png      ← Pàg 7: estructura del mòdul
+    ├── hardware-interface-pinout.png ← Pàg 30: pinout X1
+    ├── wiring-power-dq.png      ← Pàg 20: alimentació DQ
+    ├── wiring-digital-inputs.png← Pàg 21: connexions DI
+    └── wiring-digital-outputs-analog.png ← Pàg 22: connexions DQ+AI
 ```
 
 ## 📄 Llicència
 
 MIT — Ús educatiu lliure
-
-## 📖 Manual oficial
-
-El manual complet de Siemens es pot descarregar aquí:
-- **Siemens Support:** https://support.industry.siemens.com/cs/document/109745681/iot2000-extension-modules-operating-instructions
-- O直接 des del fitxer inclòs en aquest repositori.
