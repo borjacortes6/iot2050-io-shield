@@ -140,7 +140,21 @@ chmod +x /etc/rc.local
 
 **⚠️ IMPORTANT:** Les sortides DQ necessiten **alimentació externa de 24V DC** per funcionar.
 
-### Esquema de connexió
+### Esquema de connexió (del manual oficial Siemens)
+
+#### Connexió de l'alimentació per a les sortides DQ
+![Alimentació DQ](images/wiring-power-dq.png)
+
+#### Connexió de les entrades digitals (DI)
+![Entrades digitals](images/wiring-digital-inputs.png)
+
+#### Connexió de les sortides digitals (DQ) i entrades analògiques (AI)
+![Sortides digitals i entrades analògiques](images/wiring-digital-outputs-analog.png)
+
+### Hardware Interface — Taula d'assignació de pins
+![Hardware Interface Pinout](images/hardware-interface-pinout.png)
+
+### Esquema resum
 
 ```
 Bornes del shield IO (X1):
@@ -166,8 +180,6 @@ Borne 11 (0V DQ) ─────────────────────
 ```
 
 Quan activeu DQ0 (`echo 1 > ...`), el LED s'encendrà.
-
----
 
 ## 🎛️ 4. Node-RED: Dashboard amb botons ON/OFF
 
@@ -314,3 +326,9 @@ iot2050-io-shield/
 ## 📄 Llicència
 
 MIT — Ús educatiu lliure
+
+## 📖 Manual oficial
+
+El manual complet de Siemens es pot descarregar aquí:
+- **Siemens Support:** https://support.industry.siemens.com/cs/document/109745681/iot2000-extension-modules-operating-instructions
+- O直接 des del fitxer inclòs en aquest repositori.
