@@ -26,6 +26,10 @@ Descarrega el manual complet aquí:
 
 
 
+### Foto del mòdul real
+![Foto del mòdul IoT2050 amb shield IO](images/foto-modul.jpg)
+*Mòdul 6ES7647-0KA01-0AA2 connectat al IoT2050*
+
 ### Llegenda del mòdul 6ES7647-0KA01-0AA2:
 
 1. **Connector X1** — Bornes de cargol (13 pins) per a DI, DQ, AI i alimentació
