@@ -21,14 +21,10 @@ Descarrega el manual complet aquí:
 
 ## 🔍 Estructura física del mòdul (Secció 1.2.1 del manual)
 
-![Estructura del mòdul I/O - Pàg 8](images/structure-page8.png)
+![Estructura del mòdul I/O - Pàg 7](images/structure-page7.png)
 *Vista general del mòdul: connectors, LEDs i bornes*
 
 
-
-### Foto del mòdul real
-![Foto del mòdul IoT2050 amb shield IO](images/foto-modul.jpg)
-*Mòdul 6ES7647-0KA01-0AA2 connectat al IoT2050*
 
 ### Llegenda del mòdul 6ES7647-0KA01-0AA2:
 
