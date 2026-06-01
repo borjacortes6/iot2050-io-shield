@@ -1,6 +1,11 @@
 [
   {
-    "id": "tab_dashboard",
+    "id": "tab1",
+    "type": "tab",
+    "label": "Control DQ"
+  },
+  {
+    "id": "ui_tab1",
     "type": "ui_tab",
     "name": "Control IoT2050",
     "icon": "dashboard",
@@ -8,30 +13,21 @@
     "hidden": false
   },
   {
-    "id": "group_dq",
+    "id": "ui_grp",
     "type": "ui_group",
-    "name": "Sortides Digitals (DQ)",
-    "tab": "tab_dashboard",
+    "name": "Sortides Digitals",
+    "tab": "ui_tab1",
     "order": 1,
-    "disp": true,
-    "width": 6
-  },
-  {
-    "id": "group_di",
-    "type": "ui_group",
-    "name": "Entrades Digitals (DI)",
-    "tab": "tab_dashboard",
-    "order": 2,
     "disp": true,
     "width": 6
   },
   {
     "id": "btn_dq0_on",
     "type": "ui_button",
-    "group": "group_dq",
+    "group": "ui_grp",
     "order": 1,
-    "width": 2,
-    "height": 1,
+    "width": 3,
+    "height": 2,
     "passthru": false,
     "label": "DQ0 ⬤ ON",
     "color": "#4CAF50",
@@ -51,10 +47,10 @@
   {
     "id": "btn_dq0_off",
     "type": "ui_button",
-    "group": "group_dq",
+    "group": "ui_grp",
     "order": 2,
-    "width": 2,
-    "height": 1,
+    "width": 3,
+    "height": 2,
     "passthru": false,
     "label": "DQ0 ◯ OFF",
     "color": "#f44336",
@@ -64,7 +60,7 @@
     "payloadType": "str",
     "topic": "dq0",
     "x": 100,
-    "y": 160,
+    "y": 200,
     "wires": [
       [
         "exec_dq0"
@@ -72,25 +68,12 @@
     ]
   },
   {
-    "id": "status_dq0",
-    "type": "ui_text",
-    "group": "group_dq",
-    "order": 3,
-    "width": 2,
-    "height": 1,
-    "label": "DQ0:",
-    "format": "<span style='color:{{msg.payload===\"1\"?\"#4CAF50\":\"#f44336\"}}'>{{msg.payload===\"1\"?\"⬤ ON\":\"◯ OFF\"}}</span>",
-    "layout": "row-left",
-    "x": 100,
-    "y": 220
-  },
-  {
     "id": "btn_dq1_on",
     "type": "ui_button",
-    "group": "group_dq",
-    "order": 4,
-    "width": 2,
-    "height": 1,
+    "group": "ui_grp",
+    "order": 3,
+    "width": 3,
+    "height": 2,
     "passthru": false,
     "label": "DQ1 ⬤ ON",
     "color": "#4CAF50",
@@ -100,7 +83,7 @@
     "payloadType": "str",
     "topic": "dq1",
     "x": 100,
-    "y": 280,
+    "y": 300,
     "wires": [
       [
         "exec_dq1"
@@ -110,10 +93,10 @@
   {
     "id": "btn_dq1_off",
     "type": "ui_button",
-    "group": "group_dq",
-    "order": 5,
-    "width": 2,
-    "height": 1,
+    "group": "ui_grp",
+    "order": 4,
+    "width": 3,
+    "height": 2,
     "passthru": false,
     "label": "DQ1 ◯ OFF",
     "color": "#f44336",
@@ -123,25 +106,12 @@
     "payloadType": "str",
     "topic": "dq1",
     "x": 100,
-    "y": 340,
+    "y": 400,
     "wires": [
       [
         "exec_dq1"
       ]
     ]
-  },
-  {
-    "id": "status_dq1",
-    "type": "ui_text",
-    "group": "group_dq",
-    "order": 6,
-    "width": 2,
-    "height": 1,
-    "label": "DQ1:",
-    "format": "<span style='color:{{msg.payload===\"1\"?\"#4CAF50\":\"#f44336\"}}'>{{msg.payload===\"1\"?\"⬤ ON\":\"◯ OFF\"}}</span>",
-    "layout": "row-left",
-    "x": 100,
-    "y": 400
   },
   {
     "id": "exec_dq0",
@@ -152,8 +122,8 @@
     "useSpawn": false,
     "timer": "",
     "oldrc": false,
-    "x": 350,
-    "y": 130,
+    "x": 400,
+    "y": 150,
     "wires": [
       [
         "status_dq0"
@@ -171,8 +141,8 @@
     "useSpawn": false,
     "timer": "",
     "oldrc": false,
-    "x": 350,
-    "y": 310,
+    "x": 400,
+    "y": 350,
     "wires": [
       [
         "status_dq1"
@@ -182,17 +152,43 @@
     ]
   },
   {
-    "id": "timer_dq",
+    "id": "status_dq0",
+    "type": "ui_text",
+    "group": "ui_grp",
+    "order": 5,
+    "width": 6,
+    "height": 1,
+    "label": "Estat DQ0:",
+    "format": "{{msg.payload}}",
+    "layout": "row-left",
+    "x": 600,
+    "y": 150
+  },
+  {
+    "id": "status_dq1",
+    "type": "ui_text",
+    "group": "ui_grp",
+    "order": 6,
+    "width": 6,
+    "height": 1,
+    "label": "Estat DQ1:",
+    "format": "{{msg.payload}}",
+    "layout": "row-left",
+    "x": 600,
+    "y": 350
+  },
+  {
+    "id": "timer",
     "type": "inject",
-    "name": "Refrescar DQ (2s)",
-    "repeat": "2",
+    "name": "Llegir (3s)",
+    "repeat": "3",
     "crontab": "",
     "once": true,
     "onceDelay": 0.5,
-    "topic": "read_dq",
+    "topic": "read",
     "payload": "",
     "payloadType": "str",
-    "x": 50,
+    "x": 100,
     "y": 50,
     "wires": [
       [
@@ -210,8 +206,8 @@
     "useSpawn": false,
     "timer": "",
     "oldrc": false,
-    "x": 250,
-    "y": 100,
+    "x": 300,
+    "y": 80,
     "wires": [
       [
         "status_dq0"
@@ -229,8 +225,8 @@
     "useSpawn": false,
     "timer": "",
     "oldrc": false,
-    "x": 250,
-    "y": 220,
+    "x": 300,
+    "y": 280,
     "wires": [
       [
         "status_dq1"
@@ -238,188 +234,5 @@
       [],
       []
     ]
-  },
-  {
-    "id": "timer_di",
-    "type": "inject",
-    "name": "Refrescar DI (2s)",
-    "repeat": "2",
-    "crontab": "",
-    "once": true,
-    "onceDelay": 0.5,
-    "topic": "read_di",
-    "payload": "",
-    "payloadType": "str",
-    "x": 50,
-    "y": 500,
-    "wires": [
-      [
-        "exec_di0",
-        "exec_di1",
-        "exec_di2",
-        "exec_di3",
-        "exec_di4"
-      ]
-    ]
-  },
-  {
-    "id": "exec_di0",
-    "type": "exec",
-    "command": "cat /sys/class/gpio/gpio437/value",
-    "addpay": false,
-    "append": "",
-    "useSpawn": false,
-    "timer": "",
-    "oldrc": false,
-    "x": 250,
-    "y": 400,
-    "wires": [
-      [
-        "status_di0"
-      ],
-      [],
-      []
-    ]
-  },
-  {
-    "id": "status_di0",
-    "type": "ui_text",
-    "group": "group_di",
-    "order": 1,
-    "width": 3,
-    "height": 1,
-    "label": "DI0 (Borne 1):",
-    "format": "{{msg.payload}}",
-    "layout": "row-left",
-    "x": 500,
-    "y": 400
-  },
-  {
-    "id": "exec_di1",
-    "type": "exec",
-    "command": "cat /sys/class/gpio/gpio438/value",
-    "addpay": false,
-    "append": "",
-    "useSpawn": false,
-    "timer": "",
-    "oldrc": false,
-    "x": 250,
-    "y": 450,
-    "wires": [
-      [
-        "status_di1"
-      ],
-      [],
-      []
-    ]
-  },
-  {
-    "id": "status_di1",
-    "type": "ui_text",
-    "group": "group_di",
-    "order": 2,
-    "width": 3,
-    "height": 1,
-    "label": "DI1 (Borne 2):",
-    "format": "{{msg.payload}}",
-    "layout": "row-left",
-    "x": 500,
-    "y": 450
-  },
-  {
-    "id": "exec_di2",
-    "type": "exec",
-    "command": "cat /sys/class/gpio/gpio439/value",
-    "addpay": false,
-    "append": "",
-    "useSpawn": false,
-    "timer": "",
-    "oldrc": false,
-    "x": 250,
-    "y": 500,
-    "wires": [
-      [
-        "status_di2"
-      ],
-      [],
-      []
-    ]
-  },
-  {
-    "id": "status_di2",
-    "type": "ui_text",
-    "group": "group_di",
-    "order": 3,
-    "width": 3,
-    "height": 1,
-    "label": "DI2 (Borne 3):",
-    "format": "{{msg.payload}}",
-    "layout": "row-left",
-    "x": 500,
-    "y": 500
-  },
-  {
-    "id": "exec_di3",
-    "type": "exec",
-    "command": "cat /sys/class/gpio/gpio441/value",
-    "addpay": false,
-    "append": "",
-    "useSpawn": false,
-    "timer": "",
-    "oldrc": false,
-    "x": 250,
-    "y": 550,
-    "wires": [
-      [
-        "status_di3"
-      ],
-      [],
-      []
-    ]
-  },
-  {
-    "id": "status_di3",
-    "type": "ui_text",
-    "group": "group_di",
-    "order": 4,
-    "width": 3,
-    "height": 1,
-    "label": "DI3 (Borne 4):",
-    "format": "{{msg.payload}}",
-    "layout": "row-left",
-    "x": 500,
-    "y": 550
-  },
-  {
-    "id": "exec_di4",
-    "type": "exec",
-    "command": "cat /sys/class/gpio/gpio345/value",
-    "addpay": false,
-    "append": "",
-    "useSpawn": false,
-    "timer": "",
-    "oldrc": false,
-    "x": 250,
-    "y": 600,
-    "wires": [
-      [
-        "status_di4"
-      ],
-      [],
-      []
-    ]
-  },
-  {
-    "id": "status_di4",
-    "type": "ui_text",
-    "group": "group_di",
-    "order": 5,
-    "width": 3,
-    "height": 1,
-    "label": "DI4 (Borne 5):",
-    "format": "{{msg.payload}}",
-    "layout": "row-left",
-    "x": 500,
-    "y": 600
   }
 ]
