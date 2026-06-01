@@ -74,6 +74,8 @@ Descarrega el manual complet aquí:
 
 ## 🔧 Com es va descobrir el número de GPIO?
 
+> 💡 **Tipus de sortida:** Segons el datasheet (Pàg. 26), les DQ són **"current-sourcing" (PNP)**. Això vol dir que **proporcionen +24V** quan s'activen, no que connectin a GND. Per tant, la càrrega va **entre DQ i GND (borne 11)**, no entre DQ i +24V.
+
 Al contrari d'altres sistemes on els GPIOs tenen números fixos (com el GPIO2 d'un ESP32), al IoT2050 els números depenen de com el kernel assigna els controladors en arrencar.
 
 ### Pas 1: Identificar els gpiochips
@@ -131,6 +133,8 @@ echo 0 > /sys/class/gpio/gpio355/value   # Desactivar → tester marca 0V
 
 **⚠️ IMPORTANT:** Les sortides DQ necessiten **alimentació externa de 24V DC** (bornes 10 i 11).
 
+> 🔧 **Tipus de sortida: Current-sourcing (PNP).** Segons el datasheet (Pàg. 26 del manual), les DQ commuten a **+24V** (no a GND). Per tant, la càrrega es connecta **entre DQ i 0V DQ (borne 11)**.
+
 ### Alimentació per a les sortides DQ (Pàg. 20 del manual)
 
 ![Alimentació DQ](images/wiring-power-dq.png)
@@ -154,28 +158,28 @@ echo 0 > /sys/class/gpio/gpio355/value   # Desactivar → tester marca 0V
 ### Esquema resum
 
 ```
-               ┌─────────────────────────┐
-               │      IoT2050 + Shield    │
-               │                         │
-  [Borne 12]───┤ +24V                    │
-  [Borne 13]───┤ GND                     │
-               │                         │
-  [Borne 10]───┤ +24V DQ  ──────┬─── 24V │  Font externa
-  [Borne 11]───┤ 0V DQ   ──────┴─── GND  │  (9-36V DC)
-               │                         │
-  [Borne  8]───┤ DQ0 ────── Càrrega ──┐  │
-               │                      │   │
-  [Borne 10]───┤ +24V DQ ────────────┘   │
-               │                         │
-  [Borne 1]────┤ DI0 ──── Sensor/Polsador│
-               └─────────────────────────┘
+               ┌──────────────────────────────┐
+               │        IoT2050 + Shield        │
+               │                               │
+  [Borne 12]───┤ +24V   (alimentació mòdul)    │
+  [Borne 13]───┤ GND    (massa mòdul)          │
+               │                               │
+  [Borne 10]───┤ +24V DQ ──── Font 24V DC (+)  │
+  [Borne 11]───┤ 0V DQ  ──── Font 24V DC (-)  │
+               │                               │
+  [Borne  8]───┤ DQ0 ──── Càrrega ────┐       │
+               │                      │        │
+  [Borne 11]───┤ 0V DQ ───────────────┘       │
+               │                               │
+  [Borne  1]───┤ DI0 ──── Sensor/Polsador      │
+               └──────────────────────────────┘
 ```
 
 ### Exemple amb LED
 
 ```
-Borne 8 (DQ0) ──── LED ──── Resistència 1kΩ ──── Borne 10 (+24V DQ)
-Borne 11 (0V DQ) ──────────────────────────────────── GND font 24V
+Borne 8 (DQ0) ──── LED ──── Resistència 1kΩ ──── Borne 11 (0V DQ)
+Borne 10 (+24V DQ) ────────────────────────────────── Font 24V (+)
 ```
 
 Quan activeu DQ0 (`echo 1 > ...`), el LED s'encendrà.
@@ -223,11 +227,11 @@ cat /sys/class/gpio/gpio355/value
 ### Prova amb el multímetre
 
 Connecteu el tester en mode **V⎓ DC** entre:
-- **Borne 8 (DQ0)** i **Borne 10 (+24V DQ)**
-  - DQ0 = ON → marca **~24V** ✅
+- **Borne 8 (DQ0)** i **Borne 11 (0V DQ)**
+  - DQ0 = ON → marca **~24V** ✅ (la sortida DONA +24V)
   - DQ0 = OFF → marca **~0V** ❌
 
-> El transistor intern connecta DQ0 a GND (0V) quan està actiu, completant el circuit amb els 24V de l'alimentació externa.
+> Segons el datasheet (Pàg. 26), les sortides DQ són **"current-sourcing" (PNP)**: proporcionen **+24V** al borne 8 quan s'activen.
 
 ---
 
