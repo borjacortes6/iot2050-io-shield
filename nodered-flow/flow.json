@@ -152,8 +152,8 @@
   {
     "id": "timer",
     "type": "inject",
-    "name": "Llegir (3s)",
-    "repeat": "3",
+    "name": "Llegir (1s)",
+    "repeat": "1",
     "crontab": "",
     "once": true,
     "onceDelay": 0.5,
