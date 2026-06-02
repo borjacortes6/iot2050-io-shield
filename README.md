@@ -341,43 +341,11 @@ cat /sys/class/gpio/gpio355/value   # DQ1: Retorna 0 (OFF) o 1 (ON)
 cat /sys/class/gpio/gpio360/value   # DQ0
 ```
 
-### 2.3.6 Script per a l'arrencada automàtica
+### 2.3.6 Sobre l'arrencada automàtica
 
-Per evitar fer-ho manualment cada vegada, editeu `/etc/rc.local`:
-
-```bash
-nano /etc/rc.local
-```
-
-Afegiu **abans del `exit 0`**:
-
-```bash
-# Exportar GPIOs del shield IO
-echo 355 > /sys/class/gpio/export 2>/dev/null
-echo 360 > /sys/class/gpio/export 2>/dev/null
-echo 487 > /sys/class/gpio/export 2>/dev/null   # IO7-direction (PCAL9535)
-echo 488 > /sys/class/gpio/export 2>/dev/null   # IO8-direction (PCAL9535)
-
-# Configurar direcció al PCAL9535 (HARDWARE) — imprescindible!
-echo 1 > /sys/class/gpio/gpio487/value   # DQ1 = output (IO7)
-echo 1 > /sys/class/gpio/gpio488/value   # DQ0 = output (IO8)
-
-# Configurar direcció dels GPIOs natius
-echo out > /sys/class/gpio/gpio355/direction   # DQ1
-echo out > /sys/class/gpio/gpio360/direction   # DQ0
-
-# Inicialitzar a OFF
-echo 0 > /sys/class/gpio/gpio355/value
-echo 0 > /sys/class/gpio/gpio360/value
-
-exit 0
-```
-
-**IMPORTANT:** Després de guardar, doneu permís d'execució:
-
-```bash
-chmod +x /etc/rc.local
-```
+> 📌 **Per a la pràctica:** feu els passos 2.3.1 a 2.3.5 cada cop que comenceu. Així aprenem tot el procés!
+>
+> 🔧 **Si voleu desar la configuració permanentment** per evitar repetir-ho, vegeu l'**Apèndix A** al final del document.
 
 ---
 
@@ -525,3 +493,61 @@ iot2050-io-shield/
 ## 📄 Llicència
 
 MIT — Ús educatiu lliure
+
+
+---
+
+## 📌 Apèndix A: Configuració permanent (rc.local)
+
+Si voleu que els GPIOs es configurin **automàticament en cada arrencada** (per exemple, si el mòdul està instal·lat en un entorn de producció i no feu la pràctica des de zero cada cop):
+
+### Pas 1: Editar rc.local
+
+```bash
+nano /etc/rc.local
+```
+
+### Pas 2: Afegir el contingut
+
+Poseu **abans del `exit 0`**:
+
+```bash
+# Exportar GPIOs del shield IO
+echo 355 > /sys/class/gpio/export 2>/dev/null
+echo 360 > /sys/class/gpio/export 2>/dev/null
+echo 487 > /sys/class/gpio/export 2>/dev/null
+echo 488 > /sys/class/gpio/export 2>/dev/null
+
+# PCAL9535: configurar direcció (HARDWARE) — imprescindible!
+echo 1 > /sys/class/gpio/gpio487/value   # IO7-direction = output (DQ1)
+echo 1 > /sys/class/gpio/gpio488/value   # IO8-direction = output (DQ0)
+
+# Configurar direcció dels GPIOs natius
+echo out > /sys/class/gpio/gpio355/direction   # DQ1
+echo out > /sys/class/gpio/gpio360/direction   # DQ0
+
+# Inicialitzar a OFF
+echo 0 > /sys/class/gpio/gpio355/value
+echo 0 > /sys/class/gpio/gpio360/value
+
+exit 0
+```
+
+### Pas 3: Donar permís d'execució
+
+```bash
+chmod +x /etc/rc.local
+```
+
+### Pas 4: Provar
+
+```bash
+# Executar ara per veure si funciona
+bash /etc/rc.local
+
+# Comprovar
+echo 1 > /sys/class/gpio/gpio360/value   # DQ0 ON 🟢
+echo 0 > /sys/class/gpio/gpio360/value   # DQ0 OFF ⚫
+```
+
+> ✅ A partir d'ara, cada cop que arrenqui el IoT2050, els GPIOs estaran llestos i les sortides a OFF.
