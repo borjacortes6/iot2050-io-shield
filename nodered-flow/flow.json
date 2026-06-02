@@ -38,11 +38,7 @@
     "topic": "dq0",
     "x": 100,
     "y": 100,
-    "wires": [
-      [
-        "exec_dq0"
-      ]
-    ]
+    "wires": [["exec_dq0"]]
   },
   {
     "id": "btn_dq0_off",
@@ -61,11 +57,7 @@
     "topic": "dq0",
     "x": 100,
     "y": 200,
-    "wires": [
-      [
-        "exec_dq0"
-      ]
-    ]
+    "wires": [["exec_dq0"]]
   },
   {
     "id": "btn_dq1_on",
@@ -84,11 +76,7 @@
     "topic": "dq1",
     "x": 100,
     "y": 300,
-    "wires": [
-      [
-        "exec_dq1"
-      ]
-    ]
+    "wires": [["exec_dq1"]]
   },
   {
     "id": "btn_dq1_off",
@@ -107,33 +95,10 @@
     "topic": "dq1",
     "x": 100,
     "y": 400,
-    "wires": [
-      [
-        "exec_dq1"
-      ]
-    ]
+    "wires": [["exec_dq1"]]
   },
   {
     "id": "exec_dq0",
-    "type": "exec",
-    "command": "echo",
-    "addpay": true,
-    "append": " > /sys/class/gpio/gpio355/value",
-    "useSpawn": false,
-    "timer": "",
-    "oldrc": false,
-    "x": 400,
-    "y": 150,
-    "wires": [
-      [
-        "status_dq0"
-      ],
-      [],
-      []
-    ]
-  },
-  {
-    "id": "exec_dq1",
     "type": "exec",
     "command": "echo",
     "addpay": true,
@@ -142,14 +107,21 @@
     "timer": "",
     "oldrc": false,
     "x": 400,
+    "y": 150,
+    "wires": [["status_dq0"],[],[]]
+  },
+  {
+    "id": "exec_dq1",
+    "type": "exec",
+    "command": "echo",
+    "addpay": true,
+    "append": " > /sys/class/gpio/gpio355/value",
+    "useSpawn": false,
+    "timer": "",
+    "oldrc": false,
+    "x": 400,
     "y": 350,
-    "wires": [
-      [
-        "status_dq1"
-      ],
-      [],
-      []
-    ]
+    "wires": [["status_dq1"],[],[]]
   },
   {
     "id": "status_dq0",
@@ -190,34 +162,10 @@
     "payloadType": "str",
     "x": 100,
     "y": 50,
-    "wires": [
-      [
-        "exec_read_dq0",
-        "exec_read_dq1"
-      ]
-    ]
+    "wires": [["exec_read_dq0","exec_read_dq1"]]
   },
   {
     "id": "exec_read_dq0",
-    "type": "exec",
-    "command": "cat /sys/class/gpio/gpio355/value",
-    "addpay": false,
-    "append": "",
-    "useSpawn": false,
-    "timer": "",
-    "oldrc": false,
-    "x": 300,
-    "y": 80,
-    "wires": [
-      [
-        "status_dq0"
-      ],
-      [],
-      []
-    ]
-  },
-  {
-    "id": "exec_read_dq1",
     "type": "exec",
     "command": "cat /sys/class/gpio/gpio360/value",
     "addpay": false,
@@ -226,13 +174,20 @@
     "timer": "",
     "oldrc": false,
     "x": 300,
+    "y": 80,
+    "wires": [["status_dq0"],[],[]]
+  },
+  {
+    "id": "exec_read_dq1",
+    "type": "exec",
+    "command": "cat /sys/class/gpio/gpio355/value",
+    "addpay": false,
+    "append": "",
+    "useSpawn": false,
+    "timer": "",
+    "oldrc": false,
+    "x": 300,
     "y": 280,
-    "wires": [
-      [
-        "status_dq1"
-      ],
-      [],
-      []
-    ]
+    "wires": [["status_dq1"],[],[]]
   }
 ]
