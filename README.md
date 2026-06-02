@@ -240,25 +240,87 @@ cat /sys/class/gpio/gpio355/value
 
 ---
 
-## ⚙️ 2.3 Configurar i controlar els GPIOs
+### ⚠️ 2.2.1 Arquitectura del shield: PCAL9535 (el pas ocult!)
 
-### 2.3.1 Exportar els GPIOs (si no ho estan)
+El shield 6ES7647-0KA01-0AA2 utilitza **tres PCAL9535** (GPIO expanders per I2C) per gestionar les E/S. Aquests xips **controlen la direcció** dels senyals IO0-IO13 al nivell hardware:
+
+| I2C Addr | gpiochip | Funció |
+|----------|----------|--------|
+| **0x21** | **gpiochip1 (GPIOs 480-495)** | **Direction control per IO0-IO13** |
+| 0x25 | gpiochip2 (GPIOs 464-479) | Pull-up/down resistors |
+| 0x20 | gpiochip0 (GPIOs 496-511) | Enables i pull de les entrades analògiques |
+
+**Per què les DQ no funcionen de primeres?**
+
+Perquè **gpiochip1** inicialitza totes les direccions a **input (lo)**. Per poder escriure a DQ0/DQ1 cal posar el pin de direcció corresponent a **output (hi)**:
+
+| Senyal | IO | GPIO direction | Cal per DQ |
+|--------|-----|---------------|------------|
+| **DQ0** (Borne 8) | IO7 | **gpio487** (IO7-direction) | **hi** = output |
+| **DQ1** (Borne 9) | IO8 | **gpio488** (IO8-direction) | **hi** = output |
+
+**Com comprovar l'estat actual:**
 
 ```bash
-echo 355 > /sys/class/gpio/export
-echo 360 > /sys/class/gpio/export
+cat /sys/class/gpio/gpio487/value   # 0 = input (per defecte) ❌
+cat /sys/class/gpio/gpio488/value   # 1 = output (si ja està configurat) ✅
 ```
 
-> Si dona l'error "Device or resource busy", vol dir que ja estan exportats.
+> Aquesta és la **causa #1** de per què DQ0 no funciona: el PCAL9535 té IO7 en mode **input** i cal posar-lo a **output** abans d'escriure al GPIO natiu.
 
-### 2.3.2 Configurar la direcció com a OUTPUT
+
+```bash
+# Llegir l'estat actual de DQ0
+cat /sys/class/gpio/gpio355/value
+
+# Activar DQ0
+echo 1 > /sys/class/gpio/gpio355/value
+
+# Comprovar que ha canviat
+cat /sys/class/gpio/gpio355/value
+# → Ha de tornar "1"
+```
+
+> 📝 La sortida **DQ0 = gpio355** és un número que depèn de com el kernel de Linux assigna els controladors en arrencar. En un altre IoT2050 podria ser diferent, per això és important saber com descobrir-ho.
+
+---
+
+## ⚙️ 2.3 Configurar i controlar els GPIOs
+
+### 2.3.1 Exportar tots els GPIOs necessaris
+
+Cal exportar **tres** coses: els GPIOs de dades (DQ) **i** els GPIOs de control de direcció (PCAL9535):
+
+```bash
+# Exportar GPIOs de dades (DQ)
+echo 355 > /sys/class/gpio/export   # DQ0 - IO7 de dades
+echo 360 > /sys/class/gpio/export   # DQ1 - IO8 de dades
+
+# Exportar GPIOs de control de direcció (PCAL9535 a I2C 0x21)
+echo 487 > /sys/class/gpio/export   # IO7-direction (controla DQ0)
+echo 488 > /sys/class/gpio/export   # IO8-direction (controla DQ1)
+```
+
+> Si dona l'error "Device or resource busy", vol dir que ja estan exportats — no passa res.
+
+### 2.3.2 Configurar la direcció al PCAL9535 (HARDWARE)
+
+**Aquest pas és crític!** Si no es fa, les DQ no funcionaran encara que la direcció del GPIO nativi estigui a "out".
+
+```bash
+# Configurar IO7 i IO8 com a SORTIDES al PCAL9535
+echo 1 > /sys/class/gpio/gpio487/value   # IO7-direction = output (DQ0)
+echo 1 > /sys/class/gpio/gpio488/value   # IO8-direction = output (DQ1)
+```
+
+### 2.3.3 Configurar la direcció dels GPIOs natius (SOFTWARE)
 
 ```bash
 echo out > /sys/class/gpio/gpio355/direction   # DQ0 com a sortida
 echo out > /sys/class/gpio/gpio360/direction   # DQ1 com a sortida
 ```
 
-### 2.3.3 Activar i desactivar les sortides
+### 2.3.4 Activar i desactivar les sortides
 
 ```bash
 # DQ0 ON
@@ -276,14 +338,14 @@ echo 1 > /sys/class/gpio/gpio360/value
 echo 0 > /sys/class/gpio/gpio360/value
 ```
 
-### 2.3.4 Llegir l'estat actual
+### 2.3.5 Llegir l'estat actual
 
 ```bash
 cat /sys/class/gpio/gpio355/value   # Retorna 0 (OFF) o 1 (ON)
 cat /sys/class/gpio/gpio360/value
 ```
 
-### 2.3.5 Script per a l'arrencada automàtica
+### 2.3.6 Script per a l'arrencada automàtica
 
 Per evitar fer-ho manualment cada vegada:
 
@@ -297,8 +359,14 @@ Afegiu abans del `exit 0`:
 # Exportar GPIOs del shield IO
 echo 355 > /sys/class/gpio/export 2>/dev/null
 echo 360 > /sys/class/gpio/export 2>/dev/null
+echo 487 > /sys/class/gpio/export 2>/dev/null   # IO7-direction (PCAL9535)
+echo 488 > /sys/class/gpio/export 2>/dev/null   # IO8-direction (PCAL9535)
 
-# Configurar com a sortides
+# Configurar direcció al PCAL9535 (HARDWARE) — imprescindible!
+echo 1 > /sys/class/gpio/gpio487/value   # DQ0 = output
+echo 1 > /sys/class/gpio/gpio488/value   # DQ1 = output
+
+# Configurar direcció dels GPIOs natius
 echo out > /sys/class/gpio/gpio355/direction
 echo out > /sys/class/gpio/gpio360/direction
 
@@ -403,19 +471,25 @@ Cada botó és un node `ui_button` que envia `"1"` o `"0"` a un node `exec`. L'e
 ### Des de PuTTY (SSH):
 
 ```bash
-# 1. Exportar GPIOs
-echo 355 > /sys/class/gpio/export
-echo 360 > /sys/class/gpio/export
+# 1. Exportar GPIOs (dades + direcció PCAL9535)
+echo 355 > /sys/class/gpio/export   # DQ0
+echo 360 > /sys/class/gpio/export   # DQ1
+echo 487 > /sys/class/gpio/export   # IO7-direction (PCAL9535)
+echo 488 > /sys/class/gpio/export   # IO8-direction (PCAL9535)
 
-# 2. Configurar com a sortides
+# 2. Configurar direcció al PCAL9535 (HARDWARE) ⚠️ IMPRESCINDIBLE!
+echo 1 > /sys/class/gpio/gpio487/value   # DQ0 = output
+echo 1 > /sys/class/gpio/gpio488/value   # DQ1 = output
+
+# 3. Configurar direcció dels GPIOs natius
 echo out > /sys/class/gpio/gpio355/direction
 echo out > /sys/class/gpio/gpio360/direction
 
-# 3. Provar DQ0
+# 4. Provar DQ0
 echo 1 > /sys/class/gpio/gpio355/value   # 🔵 LED ON (si esteu connectats)
 echo 0 > /sys/class/gpio/gpio355/value   # ⚫ LED OFF
 
-# 4. Provar DQ1
+# 5. Provar DQ1
 echo 1 > /sys/class/gpio/gpio360/value   # 🔵 ON
 echo 0 > /sys/class/gpio/gpio360/value   # ⚫ OFF
 ```
