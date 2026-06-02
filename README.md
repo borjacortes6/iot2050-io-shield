@@ -86,7 +86,7 @@ Descarrega el manual complet aquí:
 
 ![Alimentació DQ](images/wiring-power-dq.png)
 
-*Pàg 20: connexió de la font d'alimentació externa per a DQ0 i DQ1 (bornes 10 i 11)*
+*Pàg 20: connexió de la font d'alimentació externa per a DQ0 i DQ1 (bornes 7 (L+) i 8 (Massa))*
 
 ### 1.3.2 Connexió de les entrades digitals DI (Pàg. 21 del manual)
 
@@ -106,15 +106,15 @@ Descarrega el manual complet aquí:
                ┌──────────────────────────────┐
                │        IoT2050 + Shield        │
                │                               │
-  [Borne 12]───┤ +24V   (alimentació mòdul)    │
-  [Borne 13]───┤ GND    (massa mòdul)          │
+  [Borne  7]───┤ L+ (+24V)    │
+  [Borne  8]───┤ Massa (0V)          │
                │                               │
-  [Borne 10]───┤ +24V DQ ──── Font 24V DC (+)  │
-  [Borne 11]───┤ 0V DQ  ──── Font 24V DC (-)  │
+    │
+    │
                │                               │
-  [Borne 10]───┤ DQ1 ──── Càrrega ────┐       │
+  [Borne 10]───┤ DQ1 ──── Càrrega ────┐ ────┐       │
                │                      │        │
-  [Borne 11]───┤ 0V DQ ───────────────┘       │
+  [Borne  8]───┤ Massa ───────────────┘       │
                │                               │
   [Borne  1]───┤ DI0 ──── Sensor/Polsador      │
                └──────────────────────────────┘
@@ -126,7 +126,7 @@ Descarrega el manual complet aquí:
 Borne 11 (0V DQ)   ────────────────── Font 24V (-)
 Borne 12 (+24V)   ────────────────── Font 24V (-)
 
-Borne 10 (DQ1) ──── LED 🔴 ──── R 1kΩ ──── Borne 11 (0V DQ)
+Borne 10 (DQ1) ──── LED 🔴 ──── R 1kΩ ──── Borne 8 (Massa)
 ```
 
 **Funcionament:**
@@ -139,9 +139,9 @@ Mode **V⎓ DC**:
 
 | Mesurar entre | DQ0 = ON | DQ0 = OFF |
 |--------------|----------|-----------|
-| **Borne 10 (DQ1)** i **Borne 11 (0V DQ)** | ~24V ✅ | ~0V ❌ |
+| **Borne 10 (DQ1)** i **Borne 8 (Massa)** | ~24V ✅ | ~0V ❌ |
 
-> 💡 El multímetre mesura la tensió que **surt** del borne 8 respecte a GND (borne 11).
+> 💡 El multímetre mesura la tensió que **surt** del borne 8 respecte a GND.
 
 ---
 
@@ -501,7 +501,7 @@ echo 0 > /sys/class/gpio/gpio360/value   # ⚫ DQ0 OFF
 1. Obre **http://192.168.200.1:1880/ui/**
 2. Prem els botons i observa els indicadors
 
-> ⚠️ **Si no funciona:** Comprova que tens 24V DC als bornes 10 i 11, i que el GPIO està en mode "out" (`cat /sys/class/gpio/gpio355/direction`).
+> ⚠️ **Si no funciona:** Comprova que tens 24V DC als bornes 7 (L+) i 8 (Massa), i que el GPIO està en mode "out" (`cat /sys/class/gpio/gpio355/direction`).
 
 ---
 
