@@ -75,84 +75,13 @@ Descarrega el manual complet aquí:
 | | **9** | **DQ= (DQ0)** | **Sortida digital 0 — 24V, 0.3A, PNP** |
 | | **10** | **DQ1** | **Sortida digital 1 — 24V, 0.3A, PNP** |
 
-> ⚠️ **Nota:** El shield 6ES7647-0KA01-0AA2 té **dos connectors** X11 (inferior, 6 pins) i X12 (superior, 10 pins). Això correspon a les etiquetes impreses al mòdul. Les sortides DQ són **PNP (current-sourcing)** — proporcionen +24V. Càrrega entre DQ i M1 (borne 8).-extension-modules-operating-instructions
-- **Document:** `A5E39456816-AB_Operating_Instructions_IOT2000_Extension_Modules_1910.pdf`
-
----
-
-## 📦 Models del shield
-
-| Model | Descripció |
-|-------|-----------|
-| **6ES7647-0KA01-0AA2** ⬅️ El nostre | **Input/Output Module** — 5x DI, 2x AI, **2x DQ** (amb sortides) |
-| 6ES7647-0KA02-0AA2 | Input Module Sink/Source — 8x DI (només entrades) |
-
-> El **0KA01** és el model complet amb **sortides digitals (DQ)**. El **0KA02** només té entrades.
-
----
-
-# 🔧 PART 1 — HARDWARE
-
-## 🔍 1.1 Estructura física del mòdul
-
-**Secció 1.2.1 del manual (Pàg. 7):**
-
-![Estructura del mòdul I/O - Pàg 7](images/structure-page7.png)
-
-*Pàg 7 del manual: estructura del mòdul amb descripció de cada connector*
-
-### Llegenda del mòdul 6ES7647-0KA01-0AA2:
-
-| Núm. | Connector | Descripció |
-|------|-----------|------------|
-| ① | **Analog interface M** | Massa de les entrades analògiques → X12-2, X12-5 |
-| | **U0, U1** | Entrades de tensió analògica (0-10V) → **X12-1, X12-4** |
-| | **I0, I1** | Entrades de corrent analògica (0-20mA) → **X12-3, X12-6** |
-| ② | **Digital output interface M (M1)** | Massa de les sortides digitals → X12-8 |
-| | **DO0, DO1** | Sortides digitals (24V, 0.3A) → **X12-9 (DQ0), X12-10 (DQ1)** |
-| ③ | **Digital input interface** | Entrades digitals → **X11-2 a X11-6 (DI0-DI4)** |
-| | **M (M0)** | Massa de les entrades digitals → X11-1 |
-| ④ | **X1** | Connector de bornes principal (13 pins) |
-| ⑤ | **X2** | Alimentació externa per a les sortides DQ |
-| ⑥ | **X3** | Connector Arduino (acoblament al IoT2050) |
-
----
-
-## 🔌 1.2 Pinout del connector X1 (bornes)
-
-**Secció 4.2.3 del manual — Hardware Interface (Pàg. 30):**
-
-![Hardware Interface Pinout](images/hardware-interface-pinout.png)
-
-*Pàg 30: taula d'assignació de pins del connector X1*
-
-### Taula resum de connexions:
-
-| Borne | Senyal | Funció | Observacions |
-|-------|--------|--------|-------------|
-| 1 | **DI0** | Entrada digital 0 | 24V DC (0: <5V, 1: >12V) |
-| 2 | **DI1** | Entrada digital 1 | 24V DC |
-| 3 | **DI2** | Entrada digital 2 | 24V DC |
-| 4 | **DI3** | Entrada digital 3 | 24V DC |
-| 5 | **DI4** | Entrada digital 4 | 24V DC |
-| 6 | **AI0** | Entrada analògica 0 | 0-10V DC o 0-20mA |
-| 7 | **AI1** | Entrada analògica 1 | 0-10V DC o 0-20mA |
-| **8** | — | Segons model | Consultar manual |
-| **9** | **DQ0** | **Sortida digital 0** | **24V, 0.3A, current-sourcing (PNP)** |
-| **10** | **DQ1** | **Sortida digital 1** | **24V, 0.3A, current-sourcing (PNP)** |
-| **11** | **0V DQ** | **Massa per a les sortides DQ** | **GND de la font externa** |
-| **12** | **+24V** | Alimentació del mòdul | 24V DC |
-| **11** | **0V DQ** | **Massa per a les sortides DQ** | **GND de la font externa** |
-| 12 | **+24V** | Alimentació del mòdul | 24V DC |
-| 13 | **0V/GND** | Massa del mòdul | GND |
-
----
+> ⚠️ **Nota:** El shield 6ES7647-0KA01-0AA2 té **dos connectors** X11 (inferior, 6 pins) i X12 (superior, 10 pins). Això correspon a les etiquetes impreses al mòdul. Les sortides DQ són **PNP (current-sourcing)** — proporcionen +24V. Càrrega entre DQ i M1 (X12-8).
 
 ## ⚡ 1.3 Cablejat de les sortides DQ
 
-> 🔧 Important: Segons el datasheet (Pàg. 26 del manual), les DQ són **"current-sourcing" (PNP)**. Això vol dir que **proporcionen +24V** al borne 8/9 quan s'activen. Per tant, la càrrega es connecta **entre DQ i 0V DQ (borne 11)**.
+> 🔧 Important: Segons el datasheet (Pàg. 26 del manual), les DQ són **"current-sourcing" (PNP)**. Això vol dir que **proporcionen +24V** als bornes X12-9 (DQ0) i X12-10 (DQ1) quan s'activen. Per tant, la càrrega es connecta **entre DQ i M1 (X12-8)**.
 
-**⚠️ REQUISIT INDISPENSABLE:** Les sortides DQ necessiten **alimentació externa de 24V DC** als bornes **10 (+24V DQ)** i **11 (0V DQ)**. Sense això, no funcionen encara que el software les activi.
+**⚠️ REQUISIT INDISPENSABLE:** Les sortides DQ necessiten **alimentació externa de 24V DC** al connector X12: **L+ (borne 7)** i **M1 (borne 8)**. Sense això, no funcionen encara que el software les activi.
 
 ### 1.3.1 Alimentació de les sortides DQ (Pàg. 20 del manual)
 
@@ -175,41 +104,41 @@ Descarrega el manual complet aquí:
 ### 1.3.4 Esquema resum de cablejat
 
 ```
-               ┌──────────────────────────────┐
-               │        IoT2050 + Shield        │
-               │                               │
-  [X12-7]───┤ L+ (+24V)    │
-  [X12-8]───┤ M1 (GND DQ)          │
-               │                               │
-    │
-    │
-               │                               │
-  [X12-10]───┤ DQ1 ──── Càrrega ────┐ ────┐       │
-               │                      │        │
-  [X12-8]───┤ M1 ───────────────┘       │
-               │                               │
-  [Borne  1]───┤ DI0 ──── Sensor/Polsador      │
-               └──────────────────────────────┘
+               ┌───────────────────────────────────┐
+               │         IoT2050 + Shield           │
+               │                                   │
+  [X12-7]  ───┤ L+ (+24V)    (alimentació mòdul)  │
+  [X12-8]  ───┤ M1 (GND DQ)  (massa sortides)     │
+               │                                   │
+  [X12-9]  ───┤ DQ0 ──── Càrrega ────┐           │
+               │                      │            │
+  [X12-10] ───┤ DQ1 ──── Càrrega ────┤           │
+               │                      │            │
+  [X12-8]  ───┤ M1 ───────────────────┘           │
+               │                                   │
+  [X11-2]  ───┤ DI0 ──── Sensor/Polsador          │
+  [X11-3]  ───┤ DI1 ──── Sensor/Polsador          │
+               └───────────────────────────────────┘
 ```
 
 ### 1.3.5 Exemple pràctic amb LED
 
 ```
-Borne 11 (0V DQ)   ────────────────── Font 24V (-)
-Borne 12 (+24V)   ────────────────── Font 24V (-)
+X12-7 (L+) ──── Font 24V (+)
+X12-8 (M1) ──── Font 24V (-)
 
-X12-10 (DQ1) ──── LED 🔴 ──── R 1kΩ ──── X12-8 (M1)
+X12-9 (DQ0) ──── LED 🔴 ──── R 1kΩ ──── X12-8 (M1)
 ```
 
 **Funcionament:**
-- Quan s'activa DQ0 → el borne 8 es posa a +24V → el LED s'encén
-- Quan es desactiva DQ0 → el borne 8 es posa a 0V → el LED s'apaga
+- Quan s'activa DQ0 → X12-9 es posa a +24V → el LED s'encén
+- Quan es desactiva DQ0 → X12-9 es posa a 0V → el LED s'apaga
 
 ### 1.3.6 Prova amb multímetre (sense càrrega)
 
 Mode **V⎓ DC**:
 
-| Mesurar entre | DQ0 = ON | DQ0 = OFF |
+| Mesurar entre | DQ = ON | DQ = OFF |
 |--------------|----------|-----------|
 | **X12-10 (DQ1)** i **X12-8 (M1)** | ~24V ✅ | ~0V ❌ |
 
@@ -284,8 +213,8 @@ line 33: "IO3" → gpio408+33 = gpio441 → DI3 (Borne 4)
 A **gpiochip4** (base 312, 96 línies) trobem més entrades i les **sortides**:
 ```
 line 33: "IO4" → gpio312+33 = gpio345 → DI4 (Borne 5)
-line 43: "IO7" → gpio312+43 = gpio355 → DQ1 (Borne 8) ✅
-line 48: "IO8" → gpio312+48 = gpio360 → DQ0 (Borne 9) ✅
+line 43: "IO7" → gpio312+43 = gpio355 → DQ1 (X12-10) ✅
+line 48: "IO8" → gpio312+48 = gpio360 → DQ0 (X12-9) ✅
 ```
 
 ### Pas 3: Fórmula per calcular el número de GPIO
@@ -293,7 +222,8 @@ line 48: "IO8" → gpio312+48 = gpio360 → DQ0 (Borne 9) ✅
 ```
 Número GPIO = BASE_DEL_CHIP + NÚMERO_DE_LÍNIA
 
-Exemple per DQ0: gpiochip4 (base 312) + line 43 (IO7) = gpio355
+Exemple per DQ1: gpiochip4 (base 312) + line 43 (IO7) = gpio355
+Exemple per DQ0: gpiochip4 (base 312) + line 48 (IO8) = gpio360
 ```
 
 ### Pas 4: Confirmació experimental
@@ -310,7 +240,7 @@ cat /sys/class/gpio/gpio355/value
 # → Ha de tornar "1"
 ```
 
-> 📝 La sortida **DQ0 = gpio355** és un número que depèn de com el kernel de Linux assigna els controladors en arrencar. En un altre IoT2050 podria ser diferent, per això és important saber com descobrir-ho.
+> 📝 La sortida **DQ1 = gpio355** és un número que depèn de com el kernel de Linux assigna els controladors en arrencar. En un altre IoT2050 podria ser diferent, per això és important saber com descobrir-ho.
 
 ---
 
@@ -330,8 +260,8 @@ Perquè **gpiochip1** inicialitza totes les direccions a **input (lo)**. Per pod
 
 | Senyal | IO | GPIO direction | Cal per DQ |
 |--------|-----|---------------|------------|
-| **DQ1** (Borne 10) | IO7 | **gpio487** (IO7-direction) | **hi** = output |
-| **DQ1** (Borne 9) | IO8 | **gpio488** (IO8-direction) | **hi** = output |
+| **DQ1** (X12-10) | IO7 | **gpio487** (IO7-direction) | **hi** = output |
+| **DQ0** (X12-9) | IO8 | **gpio488** (IO8-direction) | **hi** = output |
 
 **Com comprovar l'estat actual:**
 
@@ -340,22 +270,8 @@ cat /sys/class/gpio/gpio487/value   # 0 = input (per defecte) ❌
 cat /sys/class/gpio/gpio488/value   # 1 = output (si ja està configurat) ✅
 ```
 
-> Aquesta és la **causa #1** de per què DQ0 no funciona: el PCAL9535 té IO7 en mode **input** i cal posar-lo a **output** abans d'escriure al GPIO natiu.
+> Aquesta és la **causa #1** de per què DQ1 no funciona: el PCAL9535 té IO7 en mode **input** i cal posar-lo a **output** abans d'escriure al GPIO natiu.
 
-
-```bash
-# Llegir l'estat actual de DQ0
-cat /sys/class/gpio/gpio355/value
-
-# Activar DQ0
-echo 1 > /sys/class/gpio/gpio355/value
-
-# Comprovar que ha canviat
-cat /sys/class/gpio/gpio355/value
-# → Ha de tornar "1"
-```
-
-> 📝 La sortida **DQ0 = gpio355** és un número que depèn de com el kernel de Linux assigna els controladors en arrencar. En un altre IoT2050 podria ser diferent, per això és important saber com descobrir-ho.
 
 ---
 
