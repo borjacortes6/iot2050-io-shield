@@ -65,9 +65,11 @@ Descarrega el manual complet aquí:
 | 5 | **DI4** | Entrada digital 4 | 24V DC |
 | 6 | **AI0** | Entrada analògica 0 | 0-10V DC o 0-20mA |
 | 7 | **AI1** | Entrada analògica 1 | 0-10V DC o 0-20mA |
-| **8** | **DQ1** | **Sortida digital 1** | **24V, 0.3A, current-sourcing (PNP)** |
+| **8** | — | Segons model | Consultar manual |
 | **9** | **DQ0** | **Sortida digital 0** | **24V, 0.3A, current-sourcing (PNP)** |
-| **10** | **+24V DQ** | **Alimentació externa DQ (+)** | **9-36V DC — obligatori per a les sortides!** |
+| **10** | **DQ1** | **Sortida digital 1** | **24V, 0.3A, current-sourcing (PNP)** |
+| **11** | **0V DQ** | **Massa per a les sortides DQ** | **GND de la font externa** |
+| **12** | **+24V** | Alimentació del mòdul | 24V DC |
 | **11** | **0V DQ** | **Massa per a les sortides DQ** | **GND de la font externa** |
 | 12 | **+24V** | Alimentació del mòdul | 24V DC |
 | 13 | **0V/GND** | Massa del mòdul | GND |
@@ -110,7 +112,7 @@ Descarrega el manual complet aquí:
   [Borne 10]───┤ +24V DQ ──── Font 24V DC (+)  │
   [Borne 11]───┤ 0V DQ  ──── Font 24V DC (-)  │
                │                               │
-  [Borne  8]───┤ DQ1 ──── Càrrega ────┐       │
+  [Borne 10]───┤ DQ1 ──── Càrrega ────┐       │
                │                      │        │
   [Borne 11]───┤ 0V DQ ───────────────┘       │
                │                               │
@@ -121,10 +123,10 @@ Descarrega el manual complet aquí:
 ### 1.3.5 Exemple pràctic amb LED
 
 ```
-Borne 10 (+24V DQ) ────────────────── Font 24V (+)
 Borne 11 (0V DQ)   ────────────────── Font 24V (-)
+Borne 12 (+24V)   ────────────────── Font 24V (-)
 
-Borne 8 (DQ1) ──── LED 🔴 ──── R 1kΩ ──── Borne 11 (0V DQ)
+Borne 10 (DQ1) ──── LED 🔴 ──── R 1kΩ ──── Borne 11 (0V DQ)
 ```
 
 **Funcionament:**
@@ -137,7 +139,7 @@ Mode **V⎓ DC**:
 
 | Mesurar entre | DQ0 = ON | DQ0 = OFF |
 |--------------|----------|-----------|
-| **Borne 8 (DQ1)** i **Borne 11 (0V DQ)** | ~24V ✅ | ~0V ❌ |
+| **Borne 10 (DQ1)** i **Borne 11 (0V DQ)** | ~24V ✅ | ~0V ❌ |
 
 > 💡 El multímetre mesura la tensió que **surt** del borne 8 respecte a GND (borne 11).
 
@@ -256,7 +258,7 @@ Perquè **gpiochip1** inicialitza totes les direccions a **input (lo)**. Per pod
 
 | Senyal | IO | GPIO direction | Cal per DQ |
 |--------|-----|---------------|------------|
-| **DQ1** (Borne 8) | IO7 | **gpio487** (IO7-direction) | **hi** = output |
+| **DQ1** (Borne 10) | IO7 | **gpio487** (IO7-direction) | **hi** = output |
 | **DQ1** (Borne 9) | IO8 | **gpio488** (IO8-direction) | **hi** = output |
 
 **Com comprovar l'estat actual:**
@@ -325,7 +327,7 @@ echo out > /sys/class/gpio/gpio360/direction   # DQ0 com a sortida
 ```bash
 # DQ1 ON
 echo 1 > /sys/class/gpio/gpio355/value
-# El borne 8 es posa a +24V → DQ1 activa
+# El borne 10 es posa a +24V → DQ1 activa
 
 # DQ1 OFF
 echo 0 > /sys/class/gpio/gpio355/value
