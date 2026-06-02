@@ -65,8 +65,8 @@ Descarrega el manual complet aquí:
 | 5 | **DI4** | Entrada digital 4 | 24V DC |
 | 6 | **AI0** | Entrada analògica 0 | 0-10V DC o 0-20mA |
 | 7 | **AI1** | Entrada analògica 1 | 0-10V DC o 0-20mA |
-| **8** | **DQ0** | **Sortida digital 0** | **24V, 0.3A, current-sourcing (PNP)** |
-| **9** | **DQ1** | **Sortida digital 1** | **24V, 0.3A, current-sourcing (PNP)** |
+| **8** | **DQ1** | **Sortida digital 1** | **24V, 0.3A, current-sourcing (PNP)** |
+| **9** | **DQ0** | **Sortida digital 0** | **24V, 0.3A, current-sourcing (PNP)** |
 | **10** | **+24V DQ** | **Alimentació externa DQ (+)** | **9-36V DC — obligatori per a les sortides!** |
 | **11** | **0V DQ** | **Massa per a les sortides DQ** | **GND de la font externa** |
 | 12 | **+24V** | Alimentació del mòdul | 24V DC |
@@ -110,7 +110,7 @@ Descarrega el manual complet aquí:
   [Borne 10]───┤ +24V DQ ──── Font 24V DC (+)  │
   [Borne 11]───┤ 0V DQ  ──── Font 24V DC (-)  │
                │                               │
-  [Borne  8]───┤ DQ0 ──── Càrrega ────┐       │
+  [Borne  8]───┤ DQ1 ──── Càrrega ────┐       │
                │                      │        │
   [Borne 11]───┤ 0V DQ ───────────────┘       │
                │                               │
@@ -124,7 +124,7 @@ Descarrega el manual complet aquí:
 Borne 10 (+24V DQ) ────────────────── Font 24V (+)
 Borne 11 (0V DQ)   ────────────────── Font 24V (-)
 
-Borne 8 (DQ0) ──── LED 🔴 ──── R 1kΩ ──── Borne 11 (0V DQ)
+Borne 8 (DQ1) ──── LED 🔴 ──── R 1kΩ ──── Borne 11 (0V DQ)
 ```
 
 **Funcionament:**
@@ -137,7 +137,7 @@ Mode **V⎓ DC**:
 
 | Mesurar entre | DQ0 = ON | DQ0 = OFF |
 |--------------|----------|-----------|
-| **Borne 8 (DQ0)** i **Borne 11 (0V DQ)** | ~24V ✅ | ~0V ❌ |
+| **Borne 8 (DQ1)** i **Borne 11 (0V DQ)** | ~24V ✅ | ~0V ❌ |
 
 > 💡 El multímetre mesura la tensió que **surt** del borne 8 respecte a GND (borne 11).
 
@@ -210,8 +210,8 @@ line 33: "IO3" → gpio408+33 = gpio441 → DI3 (Borne 4)
 A **gpiochip4** (base 312, 96 línies) trobem més entrades i les **sortides**:
 ```
 line 33: "IO4" → gpio312+33 = gpio345 → DI4 (Borne 5)
-line 43: "IO7" → gpio312+43 = gpio355 → DQ0 (Borne 8) ✅
-line 48: "IO8" → gpio312+48 = gpio360 → DQ1 (Borne 9) ✅
+line 43: "IO7" → gpio312+43 = gpio355 → DQ1 (Borne 8) ✅
+line 48: "IO8" → gpio312+48 = gpio360 → DQ0 (Borne 9) ✅
 ```
 
 ### Pas 3: Fórmula per calcular el número de GPIO
@@ -256,7 +256,7 @@ Perquè **gpiochip1** inicialitza totes les direccions a **input (lo)**. Per pod
 
 | Senyal | IO | GPIO direction | Cal per DQ |
 |--------|-----|---------------|------------|
-| **DQ0** (Borne 8) | IO7 | **gpio487** (IO7-direction) | **hi** = output |
+| **DQ1** (Borne 8) | IO7 | **gpio487** (IO7-direction) | **hi** = output |
 | **DQ1** (Borne 9) | IO8 | **gpio488** (IO8-direction) | **hi** = output |
 
 **Com comprovar l'estat actual:**
@@ -293,8 +293,8 @@ Cal exportar **tres** coses: els GPIOs de dades (DQ) **i** els GPIOs de control 
 
 ```bash
 # Exportar GPIOs de dades (DQ)
-echo 355 > /sys/class/gpio/export   # DQ0 - IO7 de dades
-echo 360 > /sys/class/gpio/export   # DQ1 - IO8 de dades
+echo 355 > /sys/class/gpio/export   # DQ1 - IO7 de dades
+echo 360 > /sys/class/gpio/export   # DQ0 - IO8 de dades
 
 # Exportar GPIOs de control de direcció (PCAL9535 a I2C 0x21)
 echo 487 > /sys/class/gpio/export   # IO7-direction (controla DQ0)
@@ -309,40 +309,40 @@ echo 488 > /sys/class/gpio/export   # IO8-direction (controla DQ1)
 
 ```bash
 # Configurar IO7 i IO8 com a SORTIDES al PCAL9535
-echo 1 > /sys/class/gpio/gpio487/value   # IO7-direction = output (DQ0)
-echo 1 > /sys/class/gpio/gpio488/value   # IO8-direction = output (DQ1)
+echo 1 > /sys/class/gpio/gpio487/value   # IO7-direction = output (DQ1)
+echo 1 > /sys/class/gpio/gpio488/value   # IO8-direction = output (DQ0)
 ```
 
 ### 2.3.3 Configurar la direcció dels GPIOs natius (SOFTWARE)
 
 ```bash
-echo out > /sys/class/gpio/gpio355/direction   # DQ0 com a sortida
-echo out > /sys/class/gpio/gpio360/direction   # DQ1 com a sortida
+echo out > /sys/class/gpio/gpio355/direction   # DQ1 com a sortida
+echo out > /sys/class/gpio/gpio360/direction   # DQ0 com a sortida
 ```
 
 ### 2.3.4 Activar i desactivar les sortides
 
 ```bash
-# DQ0 ON
-echo 1 > /sys/class/gpio/gpio355/value
-# El borne 8 es posa a +24V → el LED s'encén
-
-# DQ0 OFF
-echo 0 > /sys/class/gpio/gpio355/value
-# El borne 8 es posa a 0V → el LED s'apaga
-
 # DQ1 ON
-echo 1 > /sys/class/gpio/gpio360/value
+echo 1 > /sys/class/gpio/gpio355/value
+# El borne 8 es posa a +24V → DQ1 activa
 
 # DQ1 OFF
+echo 0 > /sys/class/gpio/gpio355/value
+
+# DQ0 ON
+echo 1 > /sys/class/gpio/gpio360/value
+# El borne 9 es posa a +24V → DQ0 activa
+
+# DQ0 OFF
 echo 0 > /sys/class/gpio/gpio360/value
 ```
 
 ### 2.3.5 Llegir l'estat actual
 
 ```bash
-cat /sys/class/gpio/gpio355/value   # Retorna 0 (OFF) o 1 (ON)
-cat /sys/class/gpio/gpio360/value
+cat /sys/class/gpio/gpio355/value   # DQ1: Retorna 0 (OFF) o 1 (ON)
+cat /sys/class/gpio/gpio360/value   # DQ0
 ```
 
 ### 2.3.6 Script per a l'arrencada automàtica
@@ -363,12 +363,12 @@ echo 487 > /sys/class/gpio/export 2>/dev/null   # IO7-direction (PCAL9535)
 echo 488 > /sys/class/gpio/export 2>/dev/null   # IO8-direction (PCAL9535)
 
 # Configurar direcció al PCAL9535 (HARDWARE) — imprescindible!
-echo 1 > /sys/class/gpio/gpio487/value   # DQ0 = output
-echo 1 > /sys/class/gpio/gpio488/value   # DQ1 = output
+echo 1 > /sys/class/gpio/gpio487/value   # DQ1 = output (IO7)
+echo 1 > /sys/class/gpio/gpio488/value   # DQ0 = output (IO8)
 
 # Configurar direcció dels GPIOs natius
-echo out > /sys/class/gpio/gpio355/direction
-echo out > /sys/class/gpio/gpio360/direction
+echo out > /sys/class/gpio/gpio355/direction   # DQ1
+echo out > /sys/class/gpio/gpio360/direction   # DQ0
 
 # Inicialitzar a OFF
 echo 0 > /sys/class/gpio/gpio355/value
@@ -422,7 +422,7 @@ systemctl restart node-red
      └──────┬───────┘              └──────┬───────┘
             │                            │
      ┌──────▼──────┐              ┌──────▼──────┐
-     │ Exec DQ0    │              │ Exec DQ1    │
+     │ Exec DQ0    │              │ Exec DQ0    │
      │ echo > gpio355/value       │ echo > gpio360/value
      └─────────────┘              └─────────────┘
 ```
@@ -449,7 +449,7 @@ Veureu 4 botons:
 │  ┌──────────────┐  ┌──────────────┐      │
 │  │  DQ1 ⬤ ON   │  │  DQ1 ◯ OFF  │      │
 │  └──────────────┘  └──────────────┘      │
-│  Estat DQ1: 0                            │
+│  Estat DQ0: 0                            │
 └──────────────────────────────────────────┘
 ```
 
@@ -457,10 +457,10 @@ Veureu 4 botons:
 
 | Botó | Acció | Comando que s'executa |
 |------|-------|----------------------|
-| DQ0 ⬤ ON | Activa DQ0 | `echo 1 > /sys/class/gpio/gpio355/value` |
-| DQ0 ◯ OFF | Desactiva DQ0 | `echo 0 > /sys/class/gpio/gpio355/value` |
-| DQ1 ⬤ ON | Activa DQ1 | `echo 1 > /sys/class/gpio/gpio360/value` |
-| DQ1 ◯ OFF | Desactiva DQ1 | `echo 0 > /sys/class/gpio/gpio360/value` |
+| DQ1 ⬤ ON | Activa DQ1 | `echo 1 > /sys/class/gpio/gpio355/value` |
+| DQ1 ◯ OFF | Desactiva DQ1 | `echo 0 > /sys/class/gpio/gpio355/value` |
+| DQ0 ⬤ ON | Activa DQ0 | `echo 1 > /sys/class/gpio/gpio360/value` |
+| DQ0 ◯ OFF | Desactiva DQ0 | `echo 0 > /sys/class/gpio/gpio360/value` |
 
 Cada botó és un node `ui_button` que envia `"1"` o `"0"` a un node `exec`. L'exec fa un `echo` amb redirecció `>` al fitxer del GPIO corresponent.
 
@@ -472,26 +472,26 @@ Cada botó és un node `ui_button` que envia `"1"` o `"0"` a un node `exec`. L'e
 
 ```bash
 # 1. Exportar GPIOs (dades + direcció PCAL9535)
-echo 355 > /sys/class/gpio/export   # DQ0
-echo 360 > /sys/class/gpio/export   # DQ1
+echo 355 > /sys/class/gpio/export   # DQ1
+echo 360 > /sys/class/gpio/export   # DQ0
 echo 487 > /sys/class/gpio/export   # IO7-direction (PCAL9535)
 echo 488 > /sys/class/gpio/export   # IO8-direction (PCAL9535)
 
 # 2. Configurar direcció al PCAL9535 (HARDWARE) ⚠️ IMPRESCINDIBLE!
-echo 1 > /sys/class/gpio/gpio487/value   # DQ0 = output
-echo 1 > /sys/class/gpio/gpio488/value   # DQ1 = output
+echo 1 > /sys/class/gpio/gpio487/value   # DQ1 = output (IO7)
+echo 1 > /sys/class/gpio/gpio488/value   # DQ0 = output (IO8)
 
 # 3. Configurar direcció dels GPIOs natius
-echo out > /sys/class/gpio/gpio355/direction
-echo out > /sys/class/gpio/gpio360/direction
+echo out > /sys/class/gpio/gpio355/direction   # DQ1
+echo out > /sys/class/gpio/gpio360/direction   # DQ0
 
 # 4. Provar DQ0
-echo 1 > /sys/class/gpio/gpio355/value   # 🔵 LED ON (si esteu connectats)
-echo 0 > /sys/class/gpio/gpio355/value   # ⚫ LED OFF
+echo 1 > /sys/class/gpio/gpio355/value   # 🔵 DQ1 ON
+echo 0 > /sys/class/gpio/gpio355/value   # ⚫ DQ1 OFF
 
-# 5. Provar DQ1
-echo 1 > /sys/class/gpio/gpio360/value   # 🔵 ON
-echo 0 > /sys/class/gpio/gpio360/value   # ⚫ OFF
+# 5. Provar DQ0
+echo 1 > /sys/class/gpio/gpio360/value   # 🔵 DQ0 ON
+echo 0 > /sys/class/gpio/gpio360/value   # ⚫ DQ0 OFF
 ```
 
 ### Des del Node-RED:
