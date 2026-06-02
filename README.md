@@ -33,13 +33,13 @@ Descarrega el manual complet aquí:
 
 | Núm. | Connector | Descripció |
 |------|-----------|------------|
-| ① | **Analog interface M** | Massa de les entrades analògiques |
-| | **U0, U1** | Entrades de tensió analògica (0-10V) → **Bornes 6, 7** |
-| | **I0, I1** | Entrades de corrent analògica (0-20mA) |
-| ② | **Digital output interface M** | Massa de les sortides digitals |
-| | **DO0, DO1** | Sortides digitals (24V, 0.3A) → **Bornes 8 (DQ0), 9 (DQ1)** |
-| ③ | **Digital input interface** | Entrades digitals → **Bornes 1-5 (DI0-DI4)** |
-| | **M** | Massa de les entrades digitals |
+| ① | **Analog interface M** | Massa de les entrades analògiques → X12-2, X12-5 |
+| | **U0, U1** | Entrades de tensió analògica (0-10V) → **X12-1, X12-4** |
+| | **I0, I1** | Entrades de corrent analògica (0-20mA) → **X12-3, X12-6** |
+| ② | **Digital output interface M (M1)** | Massa de les sortides digitals → X12-8 |
+| | **DO0, DO1** | Sortides digitals (24V, 0.3A) → **X12-9 (DQ0), X12-10 (DQ1)** |
+| ③ | **Digital input interface** | Entrades digitals → **X11-2 a X11-6 (DI0-DI4)** |
+| | **M (M0)** | Massa de les entrades digitals → X11-1 |
 | ④ | **X1** | Connector de bornes principal (13 pins) |
 | ⑤ | **X2** | Alimentació externa per a les sortides DQ |
 | ⑥ | **X3** | Connector Arduino (acoblament al IoT2050) |
@@ -105,13 +105,13 @@ Descarrega el manual complet aquí:
 
 | Núm. | Connector | Descripció |
 |------|-----------|------------|
-| ① | **Analog interface M** | Massa de les entrades analògiques |
-| | **U0, U1** | Entrades de tensió analògica (0-10V) → **Bornes 6, 7** |
-| | **I0, I1** | Entrades de corrent analògica (0-20mA) |
-| ② | **Digital output interface M** | Massa de les sortides digitals |
-| | **DO0, DO1** | Sortides digitals (24V, 0.3A) → **Bornes 8 (DQ0), 9 (DQ1)** |
-| ③ | **Digital input interface** | Entrades digitals → **Bornes 1-5 (DI0-DI4)** |
-| | **M** | Massa de les entrades digitals |
+| ① | **Analog interface M** | Massa de les entrades analògiques → X12-2, X12-5 |
+| | **U0, U1** | Entrades de tensió analògica (0-10V) → **X12-1, X12-4** |
+| | **I0, I1** | Entrades de corrent analògica (0-20mA) → **X12-3, X12-6** |
+| ② | **Digital output interface M (M1)** | Massa de les sortides digitals → X12-8 |
+| | **DO0, DO1** | Sortides digitals (24V, 0.3A) → **X12-9 (DQ0), X12-10 (DQ1)** |
+| ③ | **Digital input interface** | Entrades digitals → **X11-2 a X11-6 (DI0-DI4)** |
+| | **M (M0)** | Massa de les entrades digitals → X11-1 |
 | ④ | **X1** | Connector de bornes principal (13 pins) |
 | ⑤ | **X2** | Alimentació externa per a les sortides DQ |
 | ⑥ | **X3** | Connector Arduino (acoblament al IoT2050) |
