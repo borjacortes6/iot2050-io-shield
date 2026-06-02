@@ -343,13 +343,13 @@ cat /sys/class/gpio/gpio360/value   # DQ0
 
 ### 2.3.6 Script per a l'arrencada automàtica
 
-Per evitar fer-ho manualment cada vegada:
+Per evitar fer-ho manualment cada vegada, editeu `/etc/rc.local`:
 
 ```bash
 nano /etc/rc.local
 ```
 
-Afegiu abans del `exit 0`:
+Afegiu **abans del `exit 0`**:
 
 ```bash
 # Exportar GPIOs del shield IO
@@ -369,9 +369,12 @@ echo out > /sys/class/gpio/gpio360/direction   # DQ0
 # Inicialitzar a OFF
 echo 0 > /sys/class/gpio/gpio355/value
 echo 0 > /sys/class/gpio/gpio360/value
+
+exit 0
 ```
 
-Després:
+**IMPORTANT:** Després de guardar, doneu permís d'execució:
+
 ```bash
 chmod +x /etc/rc.local
 ```
