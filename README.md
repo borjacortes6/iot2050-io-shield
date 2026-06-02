@@ -533,7 +533,14 @@ echo 0 > /sys/class/gpio/gpio360/value
 exit 0
 ```
 
-### Pas 3: Donar permís d'execució
+### Pas 3: Donar permís d'execució i activar servei
+
+```bash
+chmod +x /etc/rc.local
+
+# En Debian modern (systemd) cal activar el servei:
+systemctl enable rc-local
+```
 
 ```bash
 chmod +x /etc/rc.local
@@ -551,3 +558,46 @@ echo 0 > /sys/class/gpio/gpio360/value   # DQ0 OFF ⚫
 ```
 
 > ✅ A partir d'ara, cada cop que arrenqui el IoT2050, els GPIOs estaran llestos i les sortides a OFF.
+
+
+---
+
+## 📌 Apèndix B: Reset per a la pràctica
+
+Per tornar a **estat inicial** i començar la pràctica des de zero:
+
+### Opció 1 — Reiniciar el IoT2050 (recomanat)
+
+```bash
+reboot
+```
+
+Després de l'arrencada, el sistema està net i els alumnes comencen des del Pas 2.3.1.
+
+### Opció 2 — Només netejar GPIOs (sense reiniciar)
+
+```bash
+# Posar sortides a OFF
+echo 0 > /sys/class/gpio/gpio355/value
+echo 0 > /sys/class/gpio/gpio360/value
+
+# Si cal desexportar (per començar de zero)
+echo 355 > /sys/class/gpio/unexport 2>/dev/null
+echo 360 > /sys/class/gpio/unexport 2>/dev/null
+echo 487 > /sys/class/gpio/unexport 2>/dev/null
+echo 488 > /sys/class/gpio/unexport 2>/dev/null
+```
+
+### Opció 3 — Si es va activar el rc.local, desactivar-lo
+
+```bash
+# Desactivar el servei
+systemctl disable rc-local
+
+# O netejar el fitxer
+echo '#!/bin/sh -e' > /etc/rc.local
+echo 'exit 0' >> /etc/rc.local
+chmod +x /etc/rc.local
+```
+
+> 💡 **Per a la pràctica diària:** Opció 1 (reboot) + seguir els passos 2.3.1 a 2.3.5 cada cop.
