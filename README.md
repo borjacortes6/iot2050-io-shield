@@ -229,10 +229,10 @@ Exemple per DQ0: gpiochip4 (base 312) + line 48 (IO8) = gpio360
 ### Pas 4: Confirmació experimental
 
 ```bash
-# Llegir l'estat actual de DQ0
+# Llegir l'estat actual de DQ1
 cat /sys/class/gpio/gpio355/value
 
-# Activar DQ0
+# Activar DQ1
 echo 1 > /sys/class/gpio/gpio355/value
 
 # Comprovar que ha canviat
