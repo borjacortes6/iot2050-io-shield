@@ -228,19 +228,47 @@ Exemple per DQ0: gpiochip4 (base 312) + line 48 (IO8) = gpio360
 
 ### Pas 4: Confirmació experimental
 
+Primer exportem i configurem tots els GPIOs necessaris:
+
 ```bash
-# Llegir l'estat actual de DQ1
-cat /sys/class/gpio/gpio355/value
+# Exportar GPIOs de dades
+echo 355 > /sys/class/gpio/export 2>/dev/null   # DQ1 (X12-10)
+echo 360 > /sys/class/gpio/export 2>/dev/null   # DQ0 (X12-9)
 
-# Activar DQ1
-echo 1 > /sys/class/gpio/gpio355/value
+# Exportar GPIOs de direcció del PCAL9535
+echo 487 > /sys/class/gpio/export 2>/dev/null   # IO7-direction (DQ1)
+echo 488 > /sys/class/gpio/export 2>/dev/null   # IO8-direction (DQ0)
 
-# Comprovar que ha canviat
-cat /sys/class/gpio/gpio355/value
-# → Ha de tornar "1"
+# Configurar direcció al PCAL9535 (HARDWARE) — pas crític!
+echo 1 > /sys/class/gpio/gpio487/value   # DQ1 = output
+echo 1 > /sys/class/gpio/gpio488/value   # DQ0 = output
+
+# Configurar direcció dels GPIOs natius
+echo out > /sys/class/gpio/gpio355/direction   # DQ1
+echo out > /sys/class/gpio/gpio360/direction   # DQ0
 ```
 
-> 📝 La sortida **DQ1 = gpio355** és un número que depèn de com el kernel de Linux assigna els controladors en arrencar. En un altre IoT2050 podria ser diferent, per això és important saber com descobrir-ho.
+Provar DQ1 (X12-10):
+
+```bash
+echo 1 > /sys/class/gpio/gpio355/value   # DQ1 ON 🟢
+echo 0 > /sys/class/gpio/gpio355/value   # DQ1 OFF ⚫
+```
+
+Provar DQ0 (X12-9):
+
+```bash
+echo 1 > /sys/class/gpio/gpio360/value   # DQ0 ON 🟢
+echo 0 > /sys/class/gpio/gpio360/value   # DQ0 OFF ⚫
+```
+
+Verificar l'estat: 
+```bash
+cat /sys/class/gpio/gpio355/value   # DQ1: 0 o 1
+cat /sys/class/gpio/gpio360/value   # DQ0: 0 o 1
+```
+
+> 📝 Els números de GPIO (355 = DQ1, 360 = DQ0) depenen de com el kernel de Linux assigna els controladors en arrencar. En un altre IoT2050 podrien ser diferents, per això és important saber com descobrir-ho amb `gpioinfo`.
 
 ---
 
