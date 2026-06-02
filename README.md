@@ -56,6 +56,78 @@ Descarrega el manual complet aquí:
 
 ### Taula resum de connexions:
 
+| Connector | Borne | Senyal | Funció |
+|-----------|-------|--------|--------|
+| **X11** (inferior) | 1 | **M0** | Massa de les entrades digitals |
+| | 2 | **DI0** | Entrada digital 0 |
+| | 3 | **DI1** | Entrada digital 1 |
+| | 4 | **DI2** | Entrada digital 2 |
+| | 5 | **DI3** | Entrada digital 3 |
+| | 6 | **DI4** | Entrada digital 4 |
+| **X12** (superior) | 1 | **U0** | Entrada analògica 0 - tensió (+) |
+| | 2 | **M** | Massa analògica 0 |
+| | 3 | **I0** | Entrada analògica 0 - corrent (+) |
+| | 4 | **U1** | Entrada analògica 1 - tensió (+) |
+| | 5 | **M** | Massa analògica 1 |
+| | 6 | **I1** | Entrada analògica 1 - corrent (+) |
+| | **7** | **L+** | **Alimentació +24V DC del mòdul** |
+| | **8** | **M1** | **Massa per a les sortides DQ** |
+| | **9** | **DQ= (DQ0)** | **Sortida digital 0 — 24V, 0.3A, PNP** |
+| | **10** | **DQ1** | **Sortida digital 1 — 24V, 0.3A, PNP** |
+
+> ⚠️ **Nota:** El shield 6ES7647-0KA01-0AA2 té **dos connectors** X11 (inferior, 6 pins) i X12 (superior, 10 pins). Això correspon a les etiquetes impreses al mòdul. Les sortides DQ són **PNP (current-sourcing)** — proporcionen +24V. Càrrega entre DQ i M1 (borne 8).-extension-modules-operating-instructions
+- **Document:** `A5E39456816-AB_Operating_Instructions_IOT2000_Extension_Modules_1910.pdf`
+
+---
+
+## 📦 Models del shield
+
+| Model | Descripció |
+|-------|-----------|
+| **6ES7647-0KA01-0AA2** ⬅️ El nostre | **Input/Output Module** — 5x DI, 2x AI, **2x DQ** (amb sortides) |
+| 6ES7647-0KA02-0AA2 | Input Module Sink/Source — 8x DI (només entrades) |
+
+> El **0KA01** és el model complet amb **sortides digitals (DQ)**. El **0KA02** només té entrades.
+
+---
+
+# 🔧 PART 1 — HARDWARE
+
+## 🔍 1.1 Estructura física del mòdul
+
+**Secció 1.2.1 del manual (Pàg. 7):**
+
+![Estructura del mòdul I/O - Pàg 7](images/structure-page7.png)
+
+*Pàg 7 del manual: estructura del mòdul amb descripció de cada connector*
+
+### Llegenda del mòdul 6ES7647-0KA01-0AA2:
+
+| Núm. | Connector | Descripció |
+|------|-----------|------------|
+| ① | **Analog interface M** | Massa de les entrades analògiques |
+| | **U0, U1** | Entrades de tensió analògica (0-10V) → **Bornes 6, 7** |
+| | **I0, I1** | Entrades de corrent analògica (0-20mA) |
+| ② | **Digital output interface M** | Massa de les sortides digitals |
+| | **DO0, DO1** | Sortides digitals (24V, 0.3A) → **Bornes 8 (DQ0), 9 (DQ1)** |
+| ③ | **Digital input interface** | Entrades digitals → **Bornes 1-5 (DI0-DI4)** |
+| | **M** | Massa de les entrades digitals |
+| ④ | **X1** | Connector de bornes principal (13 pins) |
+| ⑤ | **X2** | Alimentació externa per a les sortides DQ |
+| ⑥ | **X3** | Connector Arduino (acoblament al IoT2050) |
+
+---
+
+## 🔌 1.2 Pinout del connector X1 (bornes)
+
+**Secció 4.2.3 del manual — Hardware Interface (Pàg. 30):**
+
+![Hardware Interface Pinout](images/hardware-interface-pinout.png)
+
+*Pàg 30: taula d'assignació de pins del connector X1*
+
+### Taula resum de connexions:
+
 | Borne | Senyal | Funció | Observacions |
 |-------|--------|--------|-------------|
 | 1 | **DI0** | Entrada digital 0 | 24V DC (0: <5V, 1: >12V) |
@@ -92,7 +164,7 @@ Descarrega el manual complet aquí:
 
 ![Entrades digitals](images/wiring-digital-inputs.png)
 
-*Pàg 21: connexió dels sensors / interruptors a les entrades DI0-DI4*
+*Pàg 21: connexió dels sensors / interruptors a les entrades DI0-DI4 (connector X11)*
 
 ### 1.3.3 Connexió de les sortides digitals DQ (Pàg. 22 del manual)
 
@@ -106,15 +178,15 @@ Descarrega el manual complet aquí:
                ┌──────────────────────────────┐
                │        IoT2050 + Shield        │
                │                               │
-  [Borne  7]───┤ L+ (+24V)    │
-  [Borne  8]───┤ Massa (0V)          │
+  [X12-7]───┤ L+ (+24V)    │
+  [X12-8]───┤ M1 (GND DQ)          │
                │                               │
     │
     │
                │                               │
-  [Borne 10]───┤ DQ1 ──── Càrrega ────┐ ────┐       │
+  [X12-10]───┤ DQ1 ──── Càrrega ────┐ ────┐       │
                │                      │        │
-  [Borne  8]───┤ Massa ───────────────┘       │
+  [X12-8]───┤ M1 ───────────────┘       │
                │                               │
   [Borne  1]───┤ DI0 ──── Sensor/Polsador      │
                └──────────────────────────────┘
@@ -126,7 +198,7 @@ Descarrega el manual complet aquí:
 Borne 11 (0V DQ)   ────────────────── Font 24V (-)
 Borne 12 (+24V)   ────────────────── Font 24V (-)
 
-Borne 10 (DQ1) ──── LED 🔴 ──── R 1kΩ ──── Borne 8 (Massa)
+X12-10 (DQ1) ──── LED 🔴 ──── R 1kΩ ──── X12-8 (M1)
 ```
 
 **Funcionament:**
@@ -139,9 +211,9 @@ Mode **V⎓ DC**:
 
 | Mesurar entre | DQ0 = ON | DQ0 = OFF |
 |--------------|----------|-----------|
-| **Borne 10 (DQ1)** i **Borne 8 (Massa)** | ~24V ✅ | ~0V ❌ |
+| **X12-10 (DQ1)** i **X12-8 (M1)** | ~24V ✅ | ~0V ❌ |
 
-> 💡 El multímetre mesura la tensió que **surt** del borne 8 respecte a GND.
+> 💡 El multímetre mesura la tensió que **surt** de DQ1 respecte a M1 (X12-8).
 
 ---
 
